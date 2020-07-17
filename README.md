@@ -16,6 +16,7 @@ On Ubuntu:
 
 ```bash
 apt install make
+sudo apt install docker.io
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt update
 sudo apt-get install -y apt-utils
@@ -49,6 +50,10 @@ git clone https://github.com/skalenetwork/skale-ima-sdk.git
 cd skale-ima-sdk
 ```
 
+## Configuration
+
+By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Main Net** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
+
 ## Setup
 
 Modify environment variables in the .env file and load.
@@ -69,10 +74,6 @@ Build the docker container:
 ./build.sh
 ```
 
-## Configuration
-
-By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Main Net** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
-
 ## Run
 
 To run IMA with Rinkeby:
@@ -87,7 +88,11 @@ screen -S IMA-SKALE-Chain-Box -d -m bash -c "./run.sh"
 tail -f data_dir/all_ima_deploy_mn.txt      # Monitor IMA Mainnet deployment
 tail -f data_dir/all_ima_deploy_sc.txt      # Monitor IMA SKALE Chain deployment
 tail -f data_dir/all_ima_registration.txt   # Monitor IMA registration
-tail -f ./data_dir/all_ima_loop.txt         # Monitor IMA agent
+tail -f data_dir/all_ima_loop.txt           # Monitor IMA agent
+
+./clean.sh                                  # Remove data files for rebuild
+docker ps                                   # Show running containers
+docker stop [NAMES]                         # Stop container before rebuilding
 ```
 
 Reach out to the developer community on Discord: [![Discord](https://img.shields.io/discord/534485763354787851.svg)](https://discord.gg/vvUtWJB)
