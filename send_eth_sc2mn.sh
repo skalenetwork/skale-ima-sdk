@@ -11,7 +11,7 @@ node ./main.js --verbose=9 --gas-price-multiplier=2 \
     --cid-s-chain="$CHAIN_ID_S_CHAIN" \
     --abi-main-net=../proxy/data/proxyMainnet.json \
     --abi-s-chain=../proxy/data/proxySchain_Bob.json \
-    --address-main-net="$ACCOUNT_FOR_MAIN_NET" \
+    --address-main-net="$ACCOUNT_FOR_MAINNET" \
     --key-s-chain="$PRIVATE_KEY_FOR_SCHAIN"
 
 sleep 20
