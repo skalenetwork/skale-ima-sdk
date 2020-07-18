@@ -1,0 +1,4 @@
+.env
+data_dir/
+dev_dir/
+.DS_Store
