@@ -4,6 +4,8 @@ _IMAGE_TO_RUN="skale-ima-sdk:latest"
 
 _DATA_DIR="./data_dir"
 mkdir -p "${_DATA_DIR}" || true > /dev/null
+mkdir -p "${_DATA_DIR}/ipc" || true > /dev/null
+mkdir -p "${_DATA_DIR}/node" || true > /dev/null
 _DEV_DIR="./dev_dir"
 mkdir -p "${_DEV_DIR}" || true > /dev/null
 cp ./config0.json "${_DEV_DIR}/config0.json" || true > /dev/null
