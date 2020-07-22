@@ -418,6 +418,7 @@
             "storageLimit": 10000000,
             "emptyBlockIntervalMs": 5000,
             "emptyBlockIntervalMsXXXXX": 3600000000,
+            "freeContractDeployment": true,
             "nodes": [
                 {
                     "nodeID": 1112,
@@ -444,6 +445,5 @@
         }
     }
 }
-
 
 
