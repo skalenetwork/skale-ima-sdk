@@ -13,7 +13,7 @@ echo "INSECURE_PRIVATE_KEY_FOR_SCHAIN=${INSECURE_PRIVATE_KEY_FOR_SCHAIN}"
 echo "URL_W3_MAIN_NET=${URL_W3_MAIN_NET}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
-/skaled/skaled --version
+
 echo " "
 echo "Will start SKALE Chain..."
 export DATA_DIR=/data_dir
