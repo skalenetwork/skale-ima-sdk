@@ -2,6 +2,48 @@
 echo " "
 echo "Welcome to SKALE IMA SDK container!!!"
 echo " "
+
+universal_shutdown_handler()
+{
+    echo " "
+    echo "universal shutdown handler called"
+    echo " "
+    echo "Stopping IMA agent transfer loop..."
+    killall node || true &> /dev/null
+    pkill -f node || true &> /dev/null
+    echo "Done, IMA stopped"
+    echo " "
+    echo "Stopping saled..."
+    killall skaled || true &> /dev/null
+    pkill -f skaled || true &> /dev/null
+    sleep 20
+    echo "Done, skaled stopped"
+}
+
+sigquit()
+{
+    echo " "
+    echo "signal QUIT received"
+    unuversal_shutdown_handler
+}
+
+sigint()
+{
+    echo " "
+    echo "signal INT received, script ending"
+    unuversal_shutdown_handler
+    echo " "
+    echo "Exitting container..."
+    echo " "
+    exit 0
+}
+
+trap 'sigquit' QUIT
+trap 'sigint'  INT
+trap ':'       HUP      # ignore the specified signals
+echo "Signal handlers were set"
+
+
 source /dev_dir/.env
 echo "NETWORK_FOR_MAINNET=${NETWORK_FOR_MAINNET}"
 echo "NETWORK_FOR_SCHAIN=${NETWORK_FOR_SCHAIN}"
@@ -19,7 +61,7 @@ echo "Will start SKALE Chain..."
 export DATA_DIR=/data_dir
 SSL_OPTS="--ssl-key /dev_dir/key.pem --ssl-cert /dev_dir/cert.pem"
 OUTPUT_OPTS=""
-OPTIONS="--no-colors --config /dev_dir/config0.json -db-path=${DATA_DIR} -v 4 --log-value-size-limit 1024000 --performance-timeline-enable --performance-timeline-max-items=16000000 ${SSL_OPTS} ${OUTPUT_OPTS}"
+OPTIONS="--no-colors --config /dev_dir/config0.json --db-path=${DATA_DIR} -v 4 --log-value-size-limit 1024000 --performance-timeline-enable --performance-timeline-max-items=16000000 ${SSL_OPTS} ${OUTPUT_OPTS}"
 /skaled/skaled ${OPTIONS} &> /data_dir/all_skaled_ouput.txt &
 sleep 5
 echo "Successfully started SKALE Chain"
@@ -110,6 +152,8 @@ killall skaled || true &> /dev/null
 pkill -f skaled || true &> /dev/null
 sleep 5
 
+universal_shutdown_handler
 echo " "
 echo "Exitting container..."
 echo " "
+exit 0

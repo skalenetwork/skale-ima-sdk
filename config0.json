@@ -298,7 +298,7 @@
             "adminOrigins": [ "*" ],
             "ipc": false,
             "ipcpath": "/data_dir/ipc",
-            "db-path": "/data_did/node",
+            "db-path": "/data_dir/node",
             "httpRpcPort": 15000,
             "httpsRpcPort": 15010,
             "wsRpcPort": 15020,
