@@ -14,28 +14,28 @@ This repo provides a SDK for running IMA on a single-node SKALE chain. This SDK 
 
 On Ubuntu:
 
-```bash
-apt install make
-sudo apt install docker.io
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update
-sudo apt-get install -y apt-utils
-sudo apt install build-essential
-sudo apt install gcc-7 g++-7 -y
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
---slave /usr/bin/g++ g++ /usr/bin/g++-7
-sudo update-alternatives --config gcc
-gcc --version
-g++ --version
+```shell
+sudo apt-get update && add-apt-repository ppa:ubuntu-toolchain-r/test && \
+    apt-get install -y apt-utils \
+    build-essential \
+    docker.io \
+    g++-7 \
+    gcc-7 \
+    make  && \
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
+        --slave /usr/bin/g++ g++ /usr/bin/g++-7 && \
+    sudo update-alternatives --config gcc && \
+    gcc --version && \
+    g++ --version
 
 # Install Nodejs, yarn
 
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt-get install -y nodejs
-node --version
-npm --version
-sudo npm install -g yarn
-yarn --version
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && \
+    sudo apt-get install -y nodejs && \
+    node --version && \
+    npm --version && \
+    sudo npm install -g yarn && \
+    yarn --version
 
 # Install Truffle
 
@@ -45,32 +45,32 @@ truffle --version
 
 ## Clone this repo
 
-```bash
+```shell
 git clone https://github.com/skalenetwork/skale-ima-sdk.git
 cd skale-ima-sdk
 ```
 
 ## Configuration
 
-By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Main Net** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
+By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Ethereum** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
 
 ## Setup
 
 Modify environment variables in the .env file and load.
 
-```bash
+```shell
 source .env
 ```
 
 Install all required parts and source code:
 
-```bash
+```shell
 ./init.sh
 ```
 
 Build the docker container:
 
-```bash
+```shell
 ./build.sh
 ```
 
@@ -78,13 +78,13 @@ Build the docker container:
 
 To run IMA with Rinkeby:
 
-```bash
+```shell
 screen -S IMA-SKALE-Chain-Box -d -m bash -c "./run.sh"
 ```
 
 ## Troubleshooting
 
-```bash
+```shell
 tail -f data_dir/all_ima_deploy_mn.txt      # Monitor IMA Mainnet deployment
 tail -f data_dir/all_ima_deploy_sc.txt      # Monitor IMA SKALE Chain deployment
 tail -f data_dir/all_ima_registration.txt   # Monitor IMA registration

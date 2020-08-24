@@ -1,4 +1,4 @@
-FROM skalenetwork/schain:1.46-develop.39
+FROM skalenetwork/schain:1.46-develop.51
 RUN apt-get update && apt-get clean && rm -rf /var/lib/apt/lists/*
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
