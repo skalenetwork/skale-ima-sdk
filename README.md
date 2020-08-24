@@ -52,7 +52,7 @@ cd skale-ima-sdk
 
 ## Configuration
 
-By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Main Net** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
+By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Ethereum** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
 
 ## Setup
 

@@ -12,7 +12,7 @@ node ./main.js --verbose=9 --gas-price-multiplier=2 \
     --abi-main-net=../proxy/data/proxyMainnet.json \
     --abi-s-chain=../proxy/data/proxySchain_Bob.json \
     --address-main-net=$ACCOUNT_FOR_ETHEREUM \
-    --key-s-chain=$INSECURE_PRIVATE_KEY_FOR_SCHAIN
+    --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN
 
 sleep 20
 
