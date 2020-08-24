@@ -45,14 +45,14 @@ echo "Signal handlers were set"
 
 
 source /dev_dir/.env
-echo "NETWORK_FOR_MAINNET=${NETWORK_FOR_MAINNET}"
+echo "NETWORK_FOR_ETHEREUM=${NETWORK_FOR_ETHEREUM}"
 echo "NETWORK_FOR_SCHAIN=${NETWORK_FOR_SCHAIN}"
 echo "CHAIN_NAME_SCHAIN=${CHAIN_NAME_SCHAIN}"
-echo "ACCOUNT_FOR_MAINNET=${ACCOUNT_FOR_MAINNET}"
+echo "ACCOUNT_FOR_ETHEREUM=${ACCOUNT_FOR_ETHEREUM}"
 echo "ACCOUNT_FOR_SCHAIN=${ACCOUNT_FOR_SCHAIN}"
-echo "INSECURE_PRIVATE_KEY_FOR_MAINNET=${INSECURE_PRIVATE_KEY_FOR_MAINNET}"
+echo "INSECURE_PRIVATE_KEY_FOR_ETHEREUM=${INSECURE_PRIVATE_KEY_FOR_ETHEREUM}"
 echo "INSECURE_PRIVATE_KEY_FOR_SCHAIN=${INSECURE_PRIVATE_KEY_FOR_SCHAIN}"
-echo "URL_W3_MAIN_NET=${URL_W3_MAIN_NET}"
+echo "URL_W3_ETHEREUM=${URL_W3_ETHEREUM}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
 
@@ -96,7 +96,7 @@ if [ ! -f /data_dir/all_ima_registration.txt ]; then
     cd /dev_dir/IMA/agent || exit
     node ./main.js --verbose=9 --gas-price-multiplier=2 \
         --register \
-        --url-main-net=$URL_W3_MAIN_NET \
+        --url-main-net=$URL_W3_ETHEREUM \
         --url-s-chain=$URL_W3_S_CHAIN \
         --id-main-net=Mainnet \
         --id-s-chain=Bob \
@@ -104,7 +104,7 @@ if [ ! -f /data_dir/all_ima_registration.txt ]; then
         --cid-s-chain=$CHAIN_ID_S_CHAIN \
         --abi-main-net=../proxy/data/proxyMainnet.json \
         --abi-s-chain=../proxy/data/proxySchain_Bob.json \
-        --key-main-net=$INSECURE_PRIVATE_KEY_FOR_MAINNET \
+        --key-main-net=$INSECURE_PRIVATE_KEY_FOR_ETHEREUM \
         --key-s-chain=$INSECURE_PRIVATE_KEY_FOR_SCHAIN &>> /data_dir/all_ima_registration.txt
     echo "Successfully registered IMA."
 fi
@@ -114,7 +114,7 @@ echo "Will start IMA agent transfer loop..."
 cd /dev_dir/IMA/agent || exit
 node ./main.js --verbose=9 --gas-price-multiplier=2 \
     --loop \
-    --url-main-net=$URL_W3_MAIN_NET \
+    --url-main-net=$URL_W3_ETHEREUM \
     --url-s-chain=$URL_W3_S_CHAIN \
     --id-main-net=Mainnet \
     --id-s-chain=Bob \
@@ -122,7 +122,7 @@ node ./main.js --verbose=9 --gas-price-multiplier=2 \
     --cid-s-chain=$CHAIN_ID_S_CHAIN \
     --abi-main-net=../proxy/data/proxyMainnet.json \
     --abi-s-chain=../proxy/data/proxySchain_Bob.json \
-    --key-main-net=$INSECURE_PRIVATE_KEY_FOR_MAINNET \
+    --key-main-net=$INSECURE_PRIVATE_KEY_FOR_ETHEREUM \
     --key-s-chain=$INSECURE_PRIVATE_KEY_FOR_SCHAIN &> /data_dir/all_ima_loop.txt &
 echo "Successfully started IMA agent transfer loop"
 
