@@ -79,6 +79,7 @@ Build the docker container:
 To run IMA with Rinkeby:
 
 ```shell
+script /dev/null
 screen -S IMA-SKALE-Chain-Box -d -m bash -c "./run.sh"
 ```
 
