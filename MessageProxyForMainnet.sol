@@ -19,8 +19,10 @@
  *   along with SKALE IMA.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pragma solidity ^0.5.3;
+pragma solidity ^0.6.10;
 pragma experimental ABIEncoderV2;
+
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 interface ContractReceiverForMainnet {
     function postMessage(
@@ -37,7 +39,7 @@ interface IContractManagerSkaleManager {
     function contracts(bytes32 contractID) external view returns(address);
 }
 
-interface ISkaleVerifier {
+interface ISchains {
     function verifySchainSignature(
         uint256 signA,
         uint256 signB,
@@ -53,7 +55,7 @@ interface ISkaleVerifier {
 }
 
 
-contract MessageProxyForMainnet {
+contract MessageProxyForMainnet is Initializable {
 
     // Note: this uses assembly example from
 
@@ -130,15 +132,6 @@ contract MessageProxyForMainnet {
     mapping ( uint256 => OutgoingMessageData ) private outgoingMessageData;
     uint256 private idxHead;
     uint256 private idxTail;
-
-    /// Create a new message proxy
-
-    constructor(string memory newChainID, address newContractManager) public {
-        owner = msg.sender;
-        authorizedCaller[msg.sender] = true;
-        chainID = newChainID;
-        contractManagerSkaleManager = newContractManager;
-    }
 
     function addAuthorizedCaller(address caller) external {
         require(msg.sender == owner, "Sender is not an owner");
@@ -325,6 +318,15 @@ contract MessageProxyForMainnet {
         connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
     }
 
+    /// Create a new message proxy
+
+    function initialize(string memory newChainID, address newContractManager) public initializer {
+        owner = msg.sender;
+        authorizedCaller[msg.sender] = true;
+        chainID = newChainID;
+        contractManagerSkaleManager = newContractManager;
+    }
+
     function verifyOutgoingMessageData(
         uint256 idxMessage,
         address sender,
@@ -354,19 +356,18 @@ contract MessageProxyForMainnet {
         view
         returns (bool)
     {
-        // address skaleVerifierAddress = IContractManagerSkaleManager(contractManagerSkaleManager).contracts(
-        //     keccak256(abi.encodePacked("SkaleVerifier"))
-        // );
-        // return ISkaleVerifier(skaleVerifierAddress).verifySchainSignature(
-        //     blsSignature[0],
-        //     blsSignature[1],
-        //     hash,
-        //     counter,
-        //     hashA,
-        //     hashB,
-        //     srcChainID
-        // );
-        return true;
+        address skaleSchains = IContractManagerSkaleManager(contractManagerSkaleManager).contracts(
+            keccak256(abi.encodePacked("Schains"))
+        );
+        return ISchains(skaleSchains).verifySchainSignature(
+            blsSignature[0],
+            blsSignature[1],
+            hash,
+            counter,
+            hashA,
+            hashB,
+            srcChainID
+        );
     }
 
     function hashedArray(Message[] memory messages) internal pure returns (bytes32) {
