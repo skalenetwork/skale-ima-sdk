@@ -13,6 +13,7 @@ if [ ! -d ./IMA ]; then
     git clone https://github.com/skalenetwork/IMA.git --recursive \
         && cd IMA \
         && cp ../../MessageProxyForMainnet.sol ./proxy/contracts/MessageProxyForMainnet.sol \
+        && cp ../../LockAndDataForMainnet.sol ./proxy/contracts/LockAndDataForMainnet.sol \
         && yarn install \
         && cd ..
 fi

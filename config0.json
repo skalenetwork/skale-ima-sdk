@@ -19,12 +19,15 @@
         "minimumDifficulty": "0x020000",
         "difficultyBoundDivisor": "0x0800",
         "durationLimit": "0x0d",
-        "blockReward": "0x4563918244F40000"
+        "blockReward": "0x4563918244F40000",
+        "externalGasDifficulty": "0x01"
     },
     "unddos": {
         "origins": [
             {
-                "origin": [ "*" ],
+                "origin": [
+                    "*"
+                ],
                 "ban_lengthy": 120,
                 "ban_peak": 15,
                 "max_calls_per_minute": 15000,
