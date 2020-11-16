@@ -25,7 +25,9 @@
     "unddos": {
         "origins": [
             {
-                "origin": [ "*" ],
+                "origin": [
+                    "*"
+                ],
                 "ban_lengthy": 120,
                 "ban_peak": 15,
                 "max_calls_per_minute": 15000,
