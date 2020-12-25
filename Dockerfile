@@ -1,4 +1,5 @@
-FROM skalenetwork/schain:1.46-develop.72
+#FROM skalenetwork/schain:1.46-develop.72
+FROM skalenetwork/schain:3.1.3-develop.4
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends apt-utils
 RUN apt-get install -y psmisc
