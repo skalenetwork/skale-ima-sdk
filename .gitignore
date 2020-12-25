@@ -2,3 +2,5 @@
 data_dir/
 dev_dir/
 .DS_Store
+CPU_MEM_monitor.log
+a.sh

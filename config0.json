@@ -740,7 +740,7 @@
         },
         "0000000000000000000000000000000000000016": {
             "precompiled": {
-                "name": "concatenateStrings",
+                "name": "fnReserved0x16",
                 "linear": {
                     "base": 15,
                     "word": 0
