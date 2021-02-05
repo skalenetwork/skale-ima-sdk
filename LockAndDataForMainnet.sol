@@ -21,17 +21,21 @@
 
 pragma solidity 0.6.12;
 
-import "./OwnableForMainnet.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+
 import "./interfaces/IContractManager.sol";
 import "./interfaces/ISchainsInternal.sol";
 import "./interfaces/IMessageProxy.sol";
+
 
 /**
  * @title Lock and Data For Mainnet
  * @dev Runs on Mainnet, holds deposited ETH, and contains mappings and
  * balances of ETH tokens received through DepositBox.
  */
-contract LockAndDataForMainnet is OwnableForMainnet {
+contract LockAndDataForMainnet is OwnableUpgradeSafe {
+    using SafeMath for uint;
 
     mapping(bytes32 => address) public permitted;
 
@@ -42,7 +46,7 @@ contract LockAndDataForMainnet is OwnableForMainnet {
     modifier allow(string memory contractName) {
         require(
             permitted[keccak256(abi.encodePacked(contractName))] == msg.sender ||
-            getOwner() == msg.sender,
+            owner() == msg.sender,
             "Not allowed"
         );
         _;
@@ -106,7 +110,7 @@ contract LockAndDataForMainnet is OwnableForMainnet {
     function addSchain(string calldata schainID, address tokenManagerAddress) external {
         require(
             isSchainOwner(msg.sender, keccak256(abi.encodePacked(schainID))) ||
-            msg.sender == getOwner(), "Not authorized caller"
+            msg.sender == owner(), "Not authorized caller"
         );
         bytes32 schainHash = keccak256(abi.encodePacked(schainID));
         require(tokenManagerAddresses[schainHash] == address(0), "SKALE chain is already set");
@@ -126,7 +130,7 @@ contract LockAndDataForMainnet is OwnableForMainnet {
     function removeSchain(string calldata schainID) external {
         require(
             isSchainOwner(msg.sender, keccak256(abi.encodePacked(schainID))) ||
-            msg.sender == getOwner(), "Not authorized caller"
+            msg.sender == owner(), "Not authorized caller"
         );
         bytes32 schainHash = keccak256(abi.encodePacked(schainID));
         require(tokenManagerAddresses[schainHash] != address(0), "SKALE chain is not set");
@@ -138,7 +142,7 @@ contract LockAndDataForMainnet is OwnableForMainnet {
      * @dev Allows DepositBox to approve transfer.
      */
     function approveTransfer(address to, uint256 amount) external allow("DepositBox") {
-        approveTransfers[to] += amount;
+        approveTransfers[to] = approveTransfers[to].add(amount);
     }
 
     /**
@@ -180,7 +184,7 @@ contract LockAndDataForMainnet is OwnableForMainnet {
     }
 
     /**
-     * @dev Checks whether LockAndDataforMainnet is connected to a SKALE chain.
+     * @dev Checks whether LockAndDataForMainnet is connected to a SKALE chain.
      */
     function hasSchain( string calldata schainID ) external view returns (bool) {
         bytes32 schainHash = keccak256(abi.encodePacked(schainID));
@@ -190,18 +194,18 @@ contract LockAndDataForMainnet is OwnableForMainnet {
         return true;
     }
 
-    function initialize() public override initializer {
-        OwnableForMainnet.initialize();
+    function initialize() public initializer {
+        OwnableUpgradeSafe.__Ownable_init();
     }
 
     /**
      * @dev Checks whether sender is owner of SKALE chain
      */
     function isSchainOwner(address sender, bytes32 schainId) public virtual view returns (bool) {
-        // address skaleChainsInternal = IContractManager(
+        //address skaleChainsInternal = IContractManager(
         //    permitted[keccak256(abi.encodePacked("ContractManagerForSkaleManager"))]
-        // ).getContract("SchainsInternal");
-        // return ISchainsInternal(skaleChainsInternal).isOwnerAddress(sender, schainId);
-        return true;
+        //).getContract("SchainsInternal");
+        //return ISchainsInternal(skaleChainsInternal).isOwnerAddress(sender, schainId);
+	return true;
     }
 }
