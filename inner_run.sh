@@ -82,6 +82,7 @@ fi
 if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo " "
     echo "Will deploy IMA to S-Chain..."
+    sleep 20
     touch /data_dir/all_ima_deploy_sc.txt
     cd /dev_dir/IMA/proxy || exit
     #truffle compile &>> /data_dir/all_ima_deploy_sc.txt
