@@ -83,6 +83,18 @@ script /dev/null
 screen -S IMA-SKALE-Chain-Box -d -m bash -c "./run.sh"
 ```
 
+## Access ABIs
+
+The ABIs geenerated for the IMA smart contracts deployed to mainnet/testnet and the SKALE Chain can be found in the following folder:
+
+```shell
+
+cd skale-ima-sdk/dev_dir/IMA/proxy/data/
+
+```
+  Mainnet ABI: `proxyMainnet.json` 
+  SKALE Chain ABI: `proxySchain_Bob.json`
+
 ## Troubleshooting
 
 ```shell
