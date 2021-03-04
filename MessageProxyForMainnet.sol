@@ -127,6 +127,8 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
     //      chainID  => tail of unprocessed messages
     mapping( bytes32 => uint ) private _idxTail;
 
+    mapping( bytes32 => mapping( address => bool) ) public registryContracts;
+
     /**
      * @dev Emitted for every outgoing message to `dstChain`.
      */
@@ -163,21 +165,25 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
      * - `newChainID` must not already be added.
      */
     function addConnectedChain(string calldata newChainID) external allow("LockAndData") {
+        bytes32 newChainIDHash = keccak256(abi.encodePacked(newChainID));
+        address deposiBoxAddress = IContractManager(lockAndDataAddress_).getContract("DepositBox");
         require(
-            keccak256(abi.encodePacked(newChainID)) !=
-            keccak256(abi.encodePacked("Mainnet")), "SKALE chain name is incorrect. Inside in MessageProxy");
-
+            newChainIDHash != keccak256(abi.encodePacked("Mainnet")),
+            "SKALE chain name is incorrect. Inside in MessageProxy"
+        );
         require(
-            !connectedChains[keccak256(abi.encodePacked(newChainID))].inited,
+            !connectedChains[newChainIDHash].inited,
             "Chain is already connected"
         );
+        require(!registryContracts[newChainIDHash][deposiBoxAddress], "DepositBox is already registered");
         connectedChains[
-            keccak256(abi.encodePacked(newChainID))
+            newChainIDHash
         ] = ConnectedChainInfo({
             incomingMessageCounter: 0,
             outgoingMessageCounter: 0,
             inited: true
         });
+        registryContracts[newChainIDHash][deposiBoxAddress] = true;
     }
 
     /**
@@ -189,11 +195,15 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
      * - `newChainID` must be initialized.
      */
     function removeConnectedChain(string calldata newChainID) external allow("LockAndData") {
+        bytes32 newChainIDHash = keccak256(abi.encodePacked(newChainID));
+        address deposiBoxAddress = IContractManager(lockAndDataAddress_).getContract("DepositBox");
         require(
-            connectedChains[keccak256(abi.encodePacked(newChainID))].inited,
+            connectedChains[newChainIDHash].inited,
             "Chain is not initialized"
         );
-        delete connectedChains[keccak256(abi.encodePacked(newChainID))];
+        require(registryContracts[newChainIDHash][deposiBoxAddress], "DepositBox is already removed");
+        delete connectedChains[newChainIDHash];
+        delete registryContracts[newChainIDHash][deposiBoxAddress];
     }
 
     /**
@@ -215,6 +225,7 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
     {
         bytes32 dstChainHash = keccak256(abi.encodePacked(dstChainID));
         require(connectedChains[dstChainHash].inited, "Destination chain is not initialized");
+        require(registryContracts[dstChainHash][msg.sender], "Sender contract is not registered");
         connectedChains[dstChainHash].outgoingMessageCounter = 
             connectedChains[dstChainHash].outgoingMessageCounter.add(1);
         _pushOutgoingMessageData(
@@ -257,20 +268,27 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
         require(
             startingCounter == connectedChains[srcChainHash].incomingMessageCounter,
             "Starting counter is not equal to incoming message counter");
-
         if (keccak256(abi.encodePacked(chainID)) == keccak256(abi.encodePacked("Mainnet"))) {
             _convertAndVerifyMessages(srcChainID, messages, sign);
         }
         for (uint256 i = 0; i < messages.length; i++) {
-            try ContractReceiverForMainnet(messages[i].destinationContract).postMessage(
-                messages[i].sender,
-                srcChainID,
-                messages[i].to,
-                messages[i].amount,
-                messages[i].data
-            ) {
-                ++startingCounter;
-            } catch Error(string memory reason) {
+            string memory revertReason = "";
+            if (!registryContracts[srcChainHash][messages[i].destinationContract]) {
+                revertReason = "Destination contract is not registered";
+            } else {
+                try ContractReceiverForMainnet(messages[i].destinationContract).postMessage(
+                    messages[i].sender,
+                    srcChainID,
+                    messages[i].to,
+                    messages[i].amount,
+                    messages[i].data
+                ) {
+                    ++startingCounter;
+                } catch Error(string memory reason) {
+                    revertReason = revertReason;
+                }
+            }
+            if (keccak256(abi.encodePacked(revertReason)) != keccak256(abi.encodePacked(""))) {
                 emit PostMessageError(
                     ++startingCounter,
                     srcChainHash,
@@ -279,7 +297,7 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
                     messages[i].to,
                     messages[i].amount,
                     messages[i].data,
-                    reason
+                    revertReason
                 );
             }
         }
@@ -316,6 +334,29 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
         require(msg.sender == owner, "Sender is not an owner");
         connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 0;
         connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
+    }
+
+    function registerExtraContract(string calldata schainName, address contractOnMainnet)
+        external
+        virtual
+        onlySchainOwner(keccak256(abi.encodePacked(schainName)))
+    {
+        // check schain owner
+        bytes32 schainNameHash = keccak256(abi.encodePacked(schainName));
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(!registryContracts[schainNameHash][contractOnMainnet], "Extra contract is already registered");
+        registryContracts[schainNameHash][contractOnMainnet] = true;
+    }
+
+    function removeExtraContract(string calldata schainName, address contractOnMainnet)
+        external
+        onlySchainOwner(keccak256(abi.encodePacked(schainName)))
+    {
+        // check schain owner
+        bytes32 schainNameHash = keccak256(abi.encodePacked(schainName));
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(registryContracts[schainNameHash][contractOnMainnet], "Extra contract is already removed");
+        delete registryContracts[keccak256(abi.encodePacked(schainName))][contractOnMainnet];
     }
 
     /**
@@ -419,6 +460,17 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
      * @dev Checks whether sender is node address from the SKALE chain
      */
     function isAuthorizedCaller(bytes32 chainId, address sender) public view returns (bool) {
+        // address skaleSchainsInternal = IContractManager(
+        //     IContractManager(lockAndDataAddress_).getContract(
+        //         "ContractManagerForSkaleManager"
+        //     )
+        // ).getContract(
+        //     "SchainsInternal"
+        // );
+        // return ISchainsInternal(skaleSchainsInternal).isNodeAddressesInGroup(
+        //     chainId,
+        //     sender
+        // );
         return true;
     }
 
@@ -468,6 +520,22 @@ contract MessageProxyForMainnet is PermissionsForMainnet {
         view
         returns (bool)
     {
+        // address skaleSchains = IContractManager(
+        //     IContractManager(lockAndDataAddress_).getContract(
+        //         "ContractManagerForSkaleManager"
+        //     )
+        // ).getContract(
+        //     "Schains"
+        // );
+        // return ISchains(skaleSchains).verifySchainSignature(
+        //     blsSignature[0],
+        //     blsSignature[1],
+        //     hash,
+        //     counter,
+        //     hashA,
+        //     hashB,
+        //     srcChainID
+        // );
         return true;
     }
 
