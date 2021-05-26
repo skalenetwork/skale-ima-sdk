@@ -74,7 +74,7 @@ if [ ! -f /data_dir/all_ima_deploy_mn.txt ]; then
     if [ ! -f /dev_dir/IMA/proxy/data/skaleManagerComponents.json ]; then
         echo '{ "contract_manager_address": "0x0000000000000000000000000000000000000000" }' > /dev_dir/IMA/proxy/data/skaleManagerComponents.json
     fi
-    truffle compile &>> /data_dir/all_ima_deploy_mn.txt
+    yarn compile &>> /data_dir/all_ima_deploy_mn.txt
     yarn run deploy-to-mainnet &>> /data_dir/all_ima_deploy_mn.txt
     echo "Successfully deployed IMA to Main Net..."
 fi
@@ -85,7 +85,6 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     sleep 20
     touch /data_dir/all_ima_deploy_sc.txt
     cd /dev_dir/IMA/proxy || exit
-    #truffle compile &>> /data_dir/all_ima_deploy_sc.txt
     yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
@@ -95,7 +94,7 @@ if [ ! -f /data_dir/all_ima_registration.txt ]; then
     echo "Will register IMA..."
     touch /data_dir/all_ima_registration.txt
     cd /dev_dir/IMA/agent || exit
-    node ./main.js --verbose=9 --gas-price-multiplier=2 \
+    node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
         --register \
         --url-main-net=$URL_W3_ETHEREUM \
         --url-s-chain=$URL_W3_S_CHAIN \
@@ -113,7 +112,7 @@ fi
 echo " "
 echo "Will start IMA agent transfer loop..."
 cd /dev_dir/IMA/agent || exit
-node ./main.js --verbose=9 --gas-price-multiplier=2 \
+node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --loop \
     --url-main-net=$URL_W3_ETHEREUM \
     --url-s-chain=$URL_W3_S_CHAIN \

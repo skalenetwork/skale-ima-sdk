@@ -12,9 +12,12 @@ cd ${_DEV_DIR} || exit
 if [ ! -d ./IMA ]; then
     git clone https://github.com/skalenetwork/IMA.git --recursive \
         && cd IMA \
-        && git checkout 80148d993d6c598c5d117618fb1f29feb682928a \
-        && cp ../../MessageProxyForMainnet.sol ./proxy/contracts/MessageProxyForMainnet.sol \
-        && cp ../../LockAndDataForMainnet.sol ./proxy/contracts/LockAndDataForMainnet.sol \
+        && git checkout develop \
+        && git fetch \
+        && git pull \
+        && git checkout 65948793ce2e0b7b398d16b3d9413c76bb9bbb7c \
+        && cp ../../MessageProxyForMainnet.sol ./proxy/contracts/mainnet/MessageProxyForMainnet.sol \
+        && cp ../../SkaleManagerClient.sol ./proxy/contracts/mainnet/SkaleManagerClient.sol \
         && yarn install \
         && cd ..
 fi
