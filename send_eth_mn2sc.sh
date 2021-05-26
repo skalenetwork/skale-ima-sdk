@@ -1,6 +1,6 @@
 #!/bin/bash
 cd dev_dir/IMA/agent
-node ./main.js --verbose=9 --gas-price-multiplier=2 \
+node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --m2s-payment \
     --ether=2 \
     --url-main-net=$URL_W3_ETHEREUM \
