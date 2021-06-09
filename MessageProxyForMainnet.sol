@@ -84,18 +84,28 @@ contract MessageProxyForMainnet is SkaleManagerClient {
         uint256 counter;
     }
 
-    bytes32 public constant MAINNET_CHAIN_ID = keccak256(abi.encodePacked("Mainnet"));
+    bytes32 public constant MAINNET_HASH = keccak256(abi.encodePacked("Mainnet"));
+    bytes32 public constant CHAIN_CONNECTOR_ROLE = keccak256("CHAIN_CONNECTOR_ROLE");
     bytes32 public constant DEBUGGER_ROLE = keccak256("DEBUGGER_ROLE");
+    bytes32 public constant EXTRA_CONTRACT_REGISTRAR_ROLE = keccak256("EXTRA_CONTRACT_REGISTRAR_ROLE");
+    bytes32 public constant CONSTANT_SETTER_ROLE = keccak256("CONSTANT_SETTER_ROLE");
 
     address public communityPoolAddress;
 
-    mapping( bytes32 => ConnectedChainInfo ) public connectedChains;
+    mapping(bytes32 => ConnectedChainInfo) public connectedChains;
+    mapping(bytes32 => mapping(address => bool)) public registryContracts;
 
-    uint256 public constant BASIC_POST_INCOMING_MESSAGES_TX = 70000;
-    uint256 public constant MESSAGE_GAS_COST = 8790;
+    uint256 public headerMessageGasCost;
+    uint256 public messageGasCost;
+    uint256 public gasLimit;
 
     modifier onlyDebugger() {
         require(hasRole(DEBUGGER_ROLE, msg.sender), "Access denied");
+        _;
+    }
+
+    modifier onlyConstantSetter() {
+        require(hasRole(CONSTANT_SETTER_ROLE, msg.sender), "Not enough permissions to set constant");
         _;
     }
 
@@ -125,18 +135,18 @@ contract MessageProxyForMainnet is SkaleManagerClient {
      * - `schainName` must not already be added.
      */
     function addConnectedChain(string calldata schainName) external {
+        bytes32 schainHash = keccak256(abi.encodePacked(schainName));
         require(
-            keccak256(abi.encodePacked(schainName)) != MAINNET_CHAIN_ID,
+            schainHash != MAINNET_HASH,
             "SKALE chain name is incorrect. Inside in MessageProxy"
         );
         require(
-            !connectedChains[keccak256(abi.encodePacked(schainName))].inited,
-            "Chain is already connected"
+            hasRole(CHAIN_CONNECTOR_ROLE, msg.sender) ||
+            isSchainOwner(msg.sender, schainHash),
+            "Not enough permissions to add connected chain"
         );
-
-        connectedChains[
-            keccak256(abi.encodePacked(schainName))
-        ] = ConnectedChainInfo({
+        require(!connectedChains[schainHash].inited,"Chain is already connected");
+        connectedChains[schainHash] = ConnectedChainInfo({
             incomingMessageCounter: 0,
             outgoingMessageCounter: 0,
             inited: true
@@ -152,11 +162,17 @@ contract MessageProxyForMainnet is SkaleManagerClient {
      * - `schainName` must be initialized.
      */
     function removeConnectedChain(string calldata schainName) external {
+        bytes32 schainHash = keccak256(abi.encodePacked(schainName));
         require(
-            connectedChains[keccak256(abi.encodePacked(schainName))].inited,
+            connectedChains[schainHash].inited,
             "Chain is not initialized"
         );
-        delete connectedChains[keccak256(abi.encodePacked(schainName))];
+        require(
+            hasRole(CHAIN_CONNECTOR_ROLE, msg.sender) ||
+            isSchainOwner(msg.sender, schainHash),
+            "Not enough permissions to remove connected chain"
+        );
+        delete connectedChains[schainHash];
     }
 
     function setCommunityPool(address newCommunityPoolAddress) external {
@@ -175,23 +191,75 @@ contract MessageProxyForMainnet is SkaleManagerClient {
      * - `targetSchainName` must be initialized.
      */
     function postOutgoingMessage(
-        bytes32 dstChainHash,
-        address dstContract,
+        bytes32 targetChainHash,
+        address targetContract,
         bytes calldata data
     )
         external
     {
-        // bytes32 dstChainHash = keccak256(abi.encodePacked(targetSchainName));
-        require(connectedChains[dstChainHash].inited, "Destination chain is not initialized");
-        uint msgCounter = connectedChains[dstChainHash].outgoingMessageCounter;
+        require(connectedChains[targetChainHash].inited, "Destination chain is not initialized");
+        require(
+            registryContracts[bytes32(0)][msg.sender] || 
+            registryContracts[targetChainHash][msg.sender],
+            "Sender contract is not registered"
+        );
+        uint msgCounter = connectedChains[targetChainHash].outgoingMessageCounter;
         emit OutgoingMessage(
-            dstChainHash,
+            targetChainHash,
             msgCounter,
             msg.sender,
-            dstContract,
+            targetContract,
             data
         );
-        connectedChains[dstChainHash].outgoingMessageCounter = msgCounter.add(1);
+        connectedChains[targetChainHash].outgoingMessageCounter = msgCounter.add(1);
+    }
+
+    function registerExtraContract(string calldata schainName, address contractOnMainnet) external {
+        bytes32 schainHash = keccak256(abi.encodePacked(schainName));
+        require(
+            hasRole(EXTRA_CONTRACT_REGISTRAR_ROLE, msg.sender) ||
+            isSchainOwner(msg.sender, schainHash),
+            "Not enough permissions to register extra contract"
+        );
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(!registryContracts[schainHash][contractOnMainnet], "Extra contract is already registered");
+        require(
+            !registryContracts[bytes32(0)][contractOnMainnet],
+            "Extra contract is already registered for all chains"
+        );
+        registryContracts[schainHash][contractOnMainnet] = true;
+    }
+
+    function registerExtraContractForAll(address contractOnMainnet) external {
+        require(
+            hasRole(EXTRA_CONTRACT_REGISTRAR_ROLE, msg.sender),
+            "Not enough permissions to register extra contract for all chains"
+        );
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(!registryContracts[bytes32(0)][contractOnMainnet], "Extra contract is already registered");
+        registryContracts[bytes32(0)][contractOnMainnet] = true;
+    }
+
+    function removeExtraContract(string calldata schainName, address contractOnMainnet) external {
+        bytes32 schainHash = keccak256(abi.encodePacked(schainName));
+        require(
+            hasRole(EXTRA_CONTRACT_REGISTRAR_ROLE, msg.sender) ||
+            isSchainOwner(msg.sender, schainHash),
+            "Not enough permissions to remove extra contract"
+        );
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(registryContracts[schainHash][contractOnMainnet], "Extra contract does not exist");
+        delete registryContracts[schainHash][contractOnMainnet];
+    }
+
+    function removeExtraContractForAll(address contractOnMainnet) external {
+        require(
+            hasRole(EXTRA_CONTRACT_REGISTRAR_ROLE, msg.sender),
+            "Not enough permissions to remove extra contract for all chains"
+        );
+        require(contractOnMainnet.isContract(), "Given address is not a contract");
+        require(registryContracts[bytes32(0)][contractOnMainnet], "Extra contract does not exist");
+        delete registryContracts[bytes32(0)][contractOnMainnet];
     }
 
     /**
@@ -214,32 +282,32 @@ contract MessageProxyForMainnet is SkaleManagerClient {
         external
     {
         uint256 gasTotal = gasleft();
-        bytes32 srcChainHash = keccak256(abi.encodePacked(fromSchainName));
-        require(connectedChains[srcChainHash].inited, "Chain is not initialized");
+        bytes32 fromSchainHash = keccak256(abi.encodePacked(fromSchainName));
+        require(connectedChains[fromSchainHash].inited, "Chain is not initialized");
         require(
-            startingCounter == connectedChains[srcChainHash].incomingMessageCounter,
+            startingCounter == connectedChains[fromSchainHash].incomingMessageCounter,
             "Starting counter is not equal to incoming message counter");
 
         require(_verifyMessages(fromSchainName, _hashedArray(messages), sign), "Signature is not verified");
         uint additionalGasPerMessage = 
             (gasTotal.sub(gasleft())
-            .add(BASIC_POST_INCOMING_MESSAGES_TX)
-            .add(messages.length * MESSAGE_GAS_COST))
+            .add(headerMessageGasCost)
+            .add(messages.length * messageGasCost))
             .div(messages.length);
         for (uint256 i = 0; i < messages.length; i++) {
             gasTotal = gasleft();
-            address receiver = _callReceiverContract(srcChainHash, messages[i], startingCounter + i);
+            address receiver = _callReceiverContract(fromSchainHash, messages[i], startingCounter + i);
             if (receiver == address(0)) 
                 continue;
             ICommunityPool(communityPoolAddress).refundGasByUser(
-                srcChainHash,
+                fromSchainHash,
                 msg.sender,
                 receiver,
                 gasTotal.sub(gasleft()).add(additionalGasPerMessage)
             );
         }
-        connectedChains[srcChainHash].incomingMessageCounter = 
-            connectedChains[srcChainHash].incomingMessageCounter.add(uint256(messages.length));
+        connectedChains[fromSchainHash].incomingMessageCounter = 
+            connectedChains[fromSchainHash].incomingMessageCounter.add(uint256(messages.length));
     }
 
     /**
@@ -251,7 +319,7 @@ contract MessageProxyForMainnet is SkaleManagerClient {
      * 
      * - `msg.sender` must be owner.
      */
-    function incrementIncomingCounter(string calldata schainName) external onlyDebugger{
+    function incrementIncomingCounter(string calldata schainName) external onlyDebugger {
         connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 
             connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter.add(1);
     }
@@ -268,6 +336,39 @@ contract MessageProxyForMainnet is SkaleManagerClient {
     function setCountersToZero(string calldata schainName) external onlyDebugger {
         connectedChains[keccak256(abi.encodePacked(schainName))].incomingMessageCounter = 0;
         connectedChains[keccak256(abi.encodePacked(schainName))].outgoingMessageCounter = 0;
+    }
+
+    /**
+     * @dev Sets headerMessageGasCost to a new value
+     * 
+     * Requirements:
+     * 
+     * - `msg.sender` must be granted as CONSTANT_SETTER_ROLE.
+     */
+    function setNewHeaderMessageGasCost(uint256 newHeaderMessageGasCost) external onlyConstantSetter {
+        headerMessageGasCost = newHeaderMessageGasCost;
+    }
+
+    /**
+     * @dev Sets messageGasCost to a new value
+     * 
+     * Requirements:
+     * 
+     * - `msg.sender` must be granted as CONSTANT_SETTER_ROLE.
+     */
+    function setNewMessageGasCost(uint256 newMessageGasCost) external onlyConstantSetter {
+        messageGasCost = newMessageGasCost;
+    }
+
+    /**
+     * @dev Sets gasLimit to a new value
+     * 
+     * Requirements:
+     * 
+     * - `msg.sender` must be granted CONSTANT_SETTER_ROLE.
+     */
+    function setNewGasLimit(uint256 newGasLimit) external onlyConstantSetter {
+        gasLimit = newGasLimit;
     }
 
     /**
@@ -333,8 +434,11 @@ contract MessageProxyForMainnet is SkaleManagerClient {
 
     // Create a new message proxy
 
-    function initialize(IContractManager contractManagerOfSkaleManager) public override initializer {
+    function initialize(IContractManager contractManagerOfSkaleManager) public virtual override initializer {
         SkaleManagerClient.initialize(contractManagerOfSkaleManager);
+        headerMessageGasCost = 70000;
+        messageGasCost = 8790;
+        gasLimit = 1000000;
     }
 
     /**
@@ -361,7 +465,7 @@ contract MessageProxyForMainnet is SkaleManagerClient {
         private
         returns (address)
     {
-        try IMessageReceiver(message.destinationContract).postMessage(
+        try IMessageReceiver(message.destinationContract).postMessage{gas: gasLimit}(
             schainHash,
             message.sender,
             message.data

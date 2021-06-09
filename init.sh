@@ -10,12 +10,12 @@ mkdir -p "${_DEV_DIR}" || true > /dev/null
 cd ${_DEV_DIR} || exit
 
 if [ ! -d ./IMA ]; then
-    git clone https://github.com/skalenetwork/IMA.git --recursive \
+    git clone https://github.com/skalenetwork/IMA.git --recursive --recurse-submodules \
         && cd IMA \
         && git checkout develop \
         && git fetch \
         && git pull \
-        && git checkout a9c529d405a4041380ed142322473730240c17e5 \
+        && git checkout 4bfa6179ecfbf78e827d0b2f50e0e7dc41938af7 \
         && cp ../../MessageProxyForMainnet.sol ./proxy/contracts/mainnet/MessageProxyForMainnet.sol \
         && cp ../../SkaleManagerClient.sol ./proxy/contracts/mainnet/SkaleManagerClient.sol \
         && yarn install \
