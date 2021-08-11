@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_IMAGE_TO_RUN="skale-ima-sdk:latest"
+_IMAGE_TO_RUN="skale-ima-sdk:0.0.1"
 
 _DATA_DIR="./data_dir"
 mkdir -p "${_DATA_DIR}" || true > /dev/null
@@ -18,4 +18,4 @@ openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/
 _args_arr=""
 _args_arr="${_args_arr} -p 15000:15000 -p 15010:15010 -p 15020:15020 -p 15030:15030 -p 15040:15040 -p 15050:15050"
 
-docker run --network=host -v $(pwd)/${_DATA_DIR}:/data_dir -v $(pwd)/${_DEV_DIR}:/dev_dir ${_args_arr} --stop-timeout 40 -i -t ${_IMAGE_TO_RUN}
+docker run -d -v $(pwd)/${_DATA_DIR}:/data_dir -v $(pwd)/${_DEV_DIR}:/dev_dir ${_args_arr} --stop-timeout 40 -i -t ${_IMAGE_TO_RUN}

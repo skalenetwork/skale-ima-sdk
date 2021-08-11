@@ -1,4 +1,4 @@
-FROM skalenetwork/schain:3.7.2-develop.8
+FROM skalenetwork/schain:3.7.3-stable.0
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=true
 # ARG DEBIAN_FRONTEND=noninteractive
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y

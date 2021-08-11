@@ -15,7 +15,7 @@ if [ ! -d ./IMA ]; then
         && git checkout develop \
         && git fetch \
         && git pull \
-        && git checkout 1.0.0-develop.244 \
+        && git checkout 1.0.0-stable.0 \
         && cp ../../MessageProxyForMainnet.sol ./proxy/contracts/mainnet/MessageProxyForMainnet.sol \
         && cp ../../SkaleManagerClient.sol ./proxy/contracts/mainnet/SkaleManagerClient.sol \
         && yarn install \
