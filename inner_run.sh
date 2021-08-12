@@ -57,12 +57,6 @@ echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
 
 
-echo "Going to install all dependencies..."
-cd /dev_dir/IMA
-yarn install
-echo "All dependencies installed"
-cd 
-
 echo " "
 echo "Will start SKALE Chain..."
 export DATA_DIR=/data_dir
@@ -77,9 +71,9 @@ if [ ! -f /data_dir/all_ima_deploy_mn.txt ]; then
     echo " "
     echo "Will deploy IMA to Main Net..."
     touch /data_dir/all_ima_deploy_mn.txt
-    cd /dev_dir/IMA/proxy || exit
-    if [ ! -f /dev_dir/IMA/proxy/data/skaleManagerComponents.json ]; then
-        echo '{ "contract_manager_address": "0x0000000000000000000000000000000000000000" }' > /dev_dir/IMA/proxy/data/skaleManagerComponents.json
+    cd /IMA/proxy || exit
+    if [ ! -f /IMA/proxy/data/skaleManagerComponents.json ]; then
+        echo '{ "contract_manager_address": "0x0000000000000000000000000000000000000000" }' > /IMA/proxy/data/skaleManagerComponents.json
     fi
     yarn compile &>> /data_dir/all_ima_deploy_mn.txt
     yarn run deploy-to-mainnet &>> /data_dir/all_ima_deploy_mn.txt
@@ -91,7 +85,7 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo "Will deploy IMA to S-Chain..."
     sleep 20
     touch /data_dir/all_ima_deploy_sc.txt
-    cd /dev_dir/IMA/proxy || exit
+    cd /IMA/proxy || exit
     yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
@@ -100,7 +94,7 @@ if [ ! -f /data_dir/all_ima_registration.txt ]; then
     echo " "
     echo "Will register IMA..."
     touch /data_dir/all_ima_registration.txt
-    cd /dev_dir/IMA/agent || exit
+    cd /IMA/agent || exit
     node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
         --register \
         --url-main-net=$URL_W3_ETHEREUM \
@@ -118,7 +112,7 @@ fi
 
 echo " "
 echo "Will start IMA agent transfer loop..."
-cd /dev_dir/IMA/agent || exit
+cd /IMA/agent || exit
 node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --loop \
     --url-main-net=$URL_W3_ETHEREUM \

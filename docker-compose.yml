@@ -15,11 +15,8 @@ services:
             NETWORK_FOR_ETHEREUM: "mainnet"
             NETWORK_FOR_SCHAIN: "schain"
             NO_NTP_CHECK: "True"
-        image: skale-ima-sdk:0.0.1
+        image: skalenetwork/ima_sdk:0.0.0
         container_name: ima_sdk
-        build:
-            context: .
-            dockerfile: Dockerfile
         ports:
             - "15000:15000"
             - "15010:15010"
@@ -30,6 +27,7 @@ services:
         volumes:
             -  ./dev_dir:/dev_dir
             -  ./data_dir:/data_dir
+            -  ./contracts_data:/IMA/proxy/data
         logging:
             driver: json-file
             options:

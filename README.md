@@ -95,6 +95,20 @@ cd skale-ima-sdk/dev_dir/IMA/proxy/data/
   Mainnet ABI: `proxyMainnet.json` 
   SKALE Chain ABI: `proxySchain_Bob.json`
 
+## Development
+
+Init repo for development
+
+```bash
+bash scripts/setup_ima.sh
+```
+
+Build and publish image:
+
+```bash
+DOCKER_USERNAME= DOCKER_PASSWORD= CONTAINER_NAME=ima_sdk BRANCH=develop VERSION=0.0.0 bash helper-scripts/build_and_publish.sh 
+```
+
 ## Troubleshooting
 
 ```shell

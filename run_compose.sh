@@ -1,7 +1,5 @@
 #!/bin/bash
 
-_IMAGE_TO_RUN="skale-ima-sdk:0.0.1"
-
 export DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd $DIR
