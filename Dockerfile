@@ -1,9 +1,12 @@
 FROM skalenetwork/schain:3.7.3-stable.0
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=true
 # ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update
+RUN apt install -y git
+RUN export NO_NTP_CHECK=True
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y dialog apt-utils psmisc
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y nodejs
 RUN node --version
 RUN npm --version

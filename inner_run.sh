@@ -56,6 +56,13 @@ echo "URL_W3_ETHEREUM=${URL_W3_ETHEREUM}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
 
+
+echo "Going to install all dependencies..."
+cd /dev_dir/IMA
+yarn install
+echo "All dependencies installed"
+cd 
+
 echo " "
 echo "Will start SKALE Chain..."
 export DATA_DIR=/data_dir
