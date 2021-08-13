@@ -64,7 +64,7 @@ SSL_OPTS="--ssl-key /dev_dir/key.pem --ssl-cert /dev_dir/cert.pem"
 OUTPUT_OPTS=""
 OPTIONS="--no-colors --config /dev_dir/config0.json --db-path=${DATA_DIR} -v 4 --log-value-size-limit 1024000 --performance-timeline-enable --performance-timeline-max-items=16000000 ${SSL_OPTS} ${OUTPUT_OPTS}"
 /skaled/skaled ${OPTIONS} &> /data_dir/all_skaled_output.txt &
-sleep 5
+sleep 20
 echo "Successfully started SKALE Chain"
 
 if [ ! -f /data_dir/all_ima_deploy_mn.txt ]; then
