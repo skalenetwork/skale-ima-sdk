@@ -40,6 +40,9 @@ services:
         image: trufflesuite/ganache-cli:beta
         container_name: ima_sdk_ganache
         command: --account="0x${PRIVATE_KEY_FOR_ETHEREUM},100000000000000000000000000" -l 80000000 -b 0.01
+        ports:
+            - "8545:8545"
+            - "8546:8546"
         networks: 
             - ima
 
