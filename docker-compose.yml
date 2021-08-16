@@ -9,9 +9,10 @@ services:
             ACCOUNT_FOR_SCHAIN: $ACCOUNT_FOR_SCHAIN
             PRIVATE_KEY_FOR_SCHAIN: $PRIVATE_KEY_FOR_SCHAIN
             NO_SIGNATURES: "true"
-            CHAIN_NAME_SCHAIN: Bob
+            CHAIN_NAME_SCHAIN: "Bob"
             URL_W3_S_CHAIN: http://127.0.0.1:15000
             CHAIN_ID_S_CHAIN: "0x12345"
+            CHAIN_ID_MAIN_NET: "0x539"
             NETWORK_FOR_ETHEREUM: "mainnet"
             NETWORK_FOR_SCHAIN: "schain"
             NO_NTP_CHECK: "True"
