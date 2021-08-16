@@ -5,7 +5,6 @@ services:
             PRIVATE_KEY_FOR_ETHEREUM: $PRIVATE_KEY_FOR_ETHEREUM
             ACCOUNT_FOR_ETHEREUM: $ACCOUNT_FOR_ETHEREUM
             URL_W3_ETHEREUM: $URL_W3_ETHEREUM
-            CHAIN_ID_MAIN_NET: $CHAIN_ID_MAIN_NET
             ACCOUNT_FOR_SCHAIN: $ACCOUNT_FOR_SCHAIN
             PRIVATE_KEY_FOR_SCHAIN: $PRIVATE_KEY_FOR_SCHAIN
             NO_SIGNATURES: "true"
@@ -40,7 +39,7 @@ services:
     ganache:
         image: trufflesuite/ganache-cli:beta
         container_name: ima_sdk_ganache
-        command: --account="0x${PRIVATE_KEY_FOR_ETHEREUM},100000000000000000000000000" --account="0x${PRIVATE_KEY_FOR_SCHAIN},100000000000000000000000000" -l 80000000
+        command: --account="0x${TEST_PRIVATE_KEY},100000000000000000000000000" --account="0x${PRIVATE_KEY_FOR_ETHEREUM},100000000000000000000000000" --account="0x${PRIVATE_KEY_FOR_SCHAIN},100000000000000000000000000" -l 80000000
         ports:
             - "8545:8545"
             - "8546:8546"
