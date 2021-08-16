@@ -86,22 +86,48 @@ function jsonFileSave( strPath, jo, bLogOutput ) {
     return false;
 }
 
+function addAccount(config, address, amount="1000000000000000000000000000000") {
+    if (address in config.accounts) {
+        console.log('Address ' + address + ' is already in accounts section');
+    } else {
+        jo.accounts[address] = {
+            "balance": amount
+        }
+        console.log('Added address: ' + address);
+    }   
+}
+
+function updateSkaledConfig() {
+    console.log("Updating skaled configuration file");
+    const strPathSkaledJSON = normalizePath(path.join( __dirname, "config0.json"));
+    
+    if(!fileExists(strPathSkaledJSON)) {
+        console.log( "CRITICAL ERROR: File \"" + strPathSkaledJSON + "\" was not found." );
+        process.exit(1);
+    }
+    
+    let jo = jsonFileLoad(strPathSkaledJSON, null, true);
+    
+    if( process.env.CHAIN_ID_S_CHAIN && process.env.CHAIN_ID_S_CHAIN.length > 0 ) {
+        jo.params.chainID = process.env.CHAIN_ID_S_CHAIN;
+        console.log('Updated chainId: ' + process.env.CHAIN_ID_S_CHAIN);
+    }
+
+    if( process.env.TEST_ADDRESS && process.env.TEST_ADDRESS.length > 0 ) {
+        jo.skaleConfig.sChain.schainOwner = process.env.TEST_ADDRESS;
+        console.log('Updated sChain owner: ' + process.env.TEST_ADDRESS);
+        addAccount(jo, process.env.TEST_ADDRESS);
+    }
+
+    if( process.env.ACCOUNT_FOR_SCHAIN && process.env.ACCOUNT_FOR_SCHAIN.length > 0 ) {
+        addAccount(jo, process.env.ACCOUNT_FOR_SCHAIN);
+    }
+
+    jsonFileSave( strPathSkaledJSON, jo, true );
+    console.log("Done.");
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-console.log( "Instrumenting skaled configuration" );
-if( process.env.CHAIN_ID_S_CHAIN && process.env.CHAIN_ID_S_CHAIN.length > 0 ) {
-    console.log( "Found CHAIN_ID_S_CHAIN = " + process.env.CHAIN_ID_S_CHAIN );
-    const strPathSkaledJSON = normalizePath( path.join( __dirname, "config0.json" ) );
-    if( fileExists( strPathSkaledJSON ) ) {
-        console.log( "Instrumenting file file \"" + strPathSkaledJSON + "\"..." );
-        let jo = jsonFileLoad( strPathSkaledJSON, null, true );
-        if( jo && typeof jo == "object" && jo.params && typeof jo.params == "object" ) {
-            jo.params.chainID = process.env.CHAIN_ID_S_CHAIN;
-            jsonFileSave( strPathSkaledJSON, jo, true );
-        } else
-            console.log( "CRITICAL ERROR: File \"" + strPathSkaledJSON + "\" has no \"params\" section." );
-    } else
-        console.log( "CRITICAL ERROR: File \"" + strPathSkaledJSON + "\" was not found." );
-}
-console.log( "Done." );
+updateSkaledConfig();
