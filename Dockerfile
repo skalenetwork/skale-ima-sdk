@@ -2,8 +2,8 @@ FROM skalenetwork/schain:3.7.3-stable.0
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=true
 # ARG DEBIAN_FRONTEND=noninteractive
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y
-RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y dialog apt-utils psmisc
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y dialog apt-utils psmisc git
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y nodejs
 RUN node --version
 RUN npm --version
@@ -18,6 +18,10 @@ RUN npm install --quiet --no-progress --unsafe-perm -g yarn@1.22.4
 RUN yarn --version
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update
 RUN npm install --quiet --no-progress --unsafe-perm -g truffle@5.0.12
+
+COPY IMA /IMA
+RUN cd /IMA && yarn install
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 EXPOSE 15000 15010 15020 15030 15040 15050
 CMD []

@@ -56,6 +56,7 @@ echo "URL_W3_ETHEREUM=${URL_W3_ETHEREUM}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
 
+
 echo " "
 echo "Will start SKALE Chain..."
 export DATA_DIR=/data_dir
@@ -63,16 +64,16 @@ SSL_OPTS="--ssl-key /dev_dir/key.pem --ssl-cert /dev_dir/cert.pem"
 OUTPUT_OPTS=""
 OPTIONS="--no-colors --config /dev_dir/config0.json --db-path=${DATA_DIR} -v 4 --log-value-size-limit 1024000 --performance-timeline-enable --performance-timeline-max-items=16000000 ${SSL_OPTS} ${OUTPUT_OPTS}"
 /skaled/skaled ${OPTIONS} &> /data_dir/all_skaled_output.txt &
-sleep 5
+sleep 20
 echo "Successfully started SKALE Chain"
 
 if [ ! -f /data_dir/all_ima_deploy_mn.txt ]; then
     echo " "
     echo "Will deploy IMA to Main Net..."
     touch /data_dir/all_ima_deploy_mn.txt
-    cd /dev_dir/IMA/proxy || exit
-    if [ ! -f /dev_dir/IMA/proxy/data/skaleManagerComponents.json ]; then
-        echo '{ "contract_manager_address": "0x0000000000000000000000000000000000000000" }' > /dev_dir/IMA/proxy/data/skaleManagerComponents.json
+    cd /IMA/proxy || exit
+    if [ ! -f /IMA/proxy/data/skaleManagerComponents.json ]; then
+        echo '{ "contract_manager_address": "0x0000000000000000000000000000000000000000" }' > /IMA/proxy/data/skaleManagerComponents.json
     fi
     yarn compile &>> /data_dir/all_ima_deploy_mn.txt
     yarn run deploy-to-mainnet &>> /data_dir/all_ima_deploy_mn.txt
@@ -84,7 +85,7 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo "Will deploy IMA to S-Chain..."
     sleep 20
     touch /data_dir/all_ima_deploy_sc.txt
-    cd /dev_dir/IMA/proxy || exit
+    cd /IMA/proxy || exit
     yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
@@ -93,7 +94,7 @@ if [ ! -f /data_dir/all_ima_registration.txt ]; then
     echo " "
     echo "Will register IMA..."
     touch /data_dir/all_ima_registration.txt
-    cd /dev_dir/IMA/agent || exit
+    cd /IMA/agent || exit
     node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
         --register \
         --url-main-net=$URL_W3_ETHEREUM \
@@ -111,7 +112,7 @@ fi
 
 echo " "
 echo "Will start IMA agent transfer loop..."
-cd /dev_dir/IMA/agent || exit
+cd /IMA/agent || exit
 node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --loop \
     --url-main-net=$URL_W3_ETHEREUM \

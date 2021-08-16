@@ -1,0 +1,51 @@
+version: '3'
+services:
+    sdk:
+        environment:
+            PRIVATE_KEY_FOR_ETHEREUM: $PRIVATE_KEY_FOR_ETHEREUM
+            ACCOUNT_FOR_ETHEREUM: $ACCOUNT_FOR_ETHEREUM
+            URL_W3_ETHEREUM: $URL_W3_ETHEREUM
+            CHAIN_ID_MAIN_NET: $CHAIN_ID_MAIN_NET
+            ACCOUNT_FOR_SCHAIN: $ACCOUNT_FOR_SCHAIN
+            PRIVATE_KEY_FOR_SCHAIN: $PRIVATE_KEY_FOR_SCHAIN
+            NO_SIGNATURES: "true"
+            CHAIN_NAME_SCHAIN: "Bob"
+            URL_W3_S_CHAIN: http://127.0.0.1:15000
+            CHAIN_ID_S_CHAIN: "0x12345"
+            CHAIN_ID_MAIN_NET: "0x539"
+            NETWORK_FOR_ETHEREUM: "mainnet"
+            NETWORK_FOR_SCHAIN: "schain"
+            NO_NTP_CHECK: "True"
+        image: skalenetwork/ima_sdk:0.0.0
+        container_name: ima_sdk
+        ports:
+            - "15000:15000"
+            - "15010:15010"
+            - "15020:15020"
+            - "15030:15030"
+            - "15040:15040"
+            - "15050:15050"
+        volumes:
+            -  ./dev_dir:/dev_dir
+            -  ./data_dir:/data_dir
+            -  ./contracts_data:/IMA/proxy/data
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "4"
+        restart: unless-stopped
+        networks:
+            - ima
+    ganache:
+        image: trufflesuite/ganache-cli:beta
+        container_name: ima_sdk_ganache
+        command: --account="0x${PRIVATE_KEY_FOR_ETHEREUM},100000000000000000000000000" --account="0x${PRIVATE_KEY_FOR_SCHAIN},100000000000000000000000000" -l 80000000
+        ports:
+            - "8545:8545"
+            - "8546:8546"
+        networks: 
+            - ima
+
+networks:
+    ima:
