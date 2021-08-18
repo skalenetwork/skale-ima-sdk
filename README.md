@@ -20,13 +20,19 @@ cp .env-compose-sample .env
 nano .env
 ```
 
-3. Execute to run SDK and deploy contracts:
+3. Export environment variables:
+
+```bash
+export $(grep -v '^#' .env | xargs)
+```
+
+4. Execute to run SDK and deploy contracts:
 
 ```bash
 WAIT=True bash scripts/run_sdk.sh
 ```
 
-4. When you're done, stop SDK:
+5. When you're done, stop SDK:
 
 ```bash
 CLEANUP=True  bash scripts/stop_sdk.sh
