@@ -43,15 +43,26 @@ trap 'sigint'  INT
 trap ':'       HUP      # ignore the specified signals
 echo "Signal handlers were set"
 
-
 source /dev_dir/.env
+
+if [ ! $PRIVATE_KEY_FOR_ETHEREUM ]; then
+    export PRIVATE_KEY_FOR_ETHEREUM=$SDK_PRIVATE_KEY
+    export ACCOUNT_FOR_ETHEREUM=$SDK_ADDRESS
+fi
+if [ ! $PRIVATE_KEY_FOR_SCHAIN ]; then
+    export PRIVATE_KEY_FOR_SCHAIN=$SDK_PRIVATE_KEY
+    export ACCOUNT_FOR_SCHAIN=$SDK_ADDRESS
+fi
+
 echo "NETWORK_FOR_ETHEREUM=${NETWORK_FOR_ETHEREUM}"
 echo "NETWORK_FOR_SCHAIN=${NETWORK_FOR_SCHAIN}"
 echo "CHAIN_NAME_SCHAIN=${CHAIN_NAME_SCHAIN}"
+
 echo "ACCOUNT_FOR_ETHEREUM=${ACCOUNT_FOR_ETHEREUM}"
 echo "ACCOUNT_FOR_SCHAIN=${ACCOUNT_FOR_SCHAIN}"
 echo "INSECURE_PRIVATE_KEY_FOR_ETHEREUM=${PRIVATE_KEY_FOR_ETHEREUM}"
 echo "INSECURE_PRIVATE_KEY_FOR_SCHAIN=${PRIVATE_KEY_FOR_SCHAIN}"
+
 echo "URL_W3_ETHEREUM=${URL_W3_ETHEREUM}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
 echo " "
@@ -86,7 +97,7 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     sleep 20
     touch /data_dir/all_ima_deploy_sc.txt
     cd /IMA/proxy || exit
-    yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
+    ACCOUNT_FOR_SCHAIN=$TEST_ADDRESS PRIVATE_KEY_FOR_SCHAIN=$TEST_PRIVATE_KEY yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
 
