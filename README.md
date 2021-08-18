@@ -4,6 +4,34 @@
 
 This repo provides a SDK for running IMA on a single-node SKALE chain. This SDK operates without BLS signature verification.
 
+## Simple usage example
+
+### Prerequisites
+
+* Docker
+* docker-compose
+* nodejs (any version)
+
+1. Clone this repo
+2. Copy .env template and fill variables:
+
+```bash
+cp .env-compose-sample .env
+nano .env
+```
+
+3. Execute to run SDK and deploy contracts:
+
+```bash
+WAIT=True bash scripts/run_sdk.sh
+```
+
+4. When you're done, stop SDK:
+
+```bash
+CLEANUP=True  bash scripts/stop_sdk.sh
+```
+
 ## Prerequisites
 
 * gcc/g++ 7
