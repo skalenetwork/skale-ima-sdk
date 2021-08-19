@@ -123,6 +123,12 @@ function updateSkaledConfig() {
         addAccount(jo, process.env.ACCOUNT_FOR_SCHAIN);
     }
 
+    if( process.env.SKALED_LOG_LEVEL && process.env.SKALED_LOG_LEVEL.length > 0 ) {
+        jo.skaleConfig.nodeInfo.logLevel = process.env.SKALED_LOG_LEVEL;
+        jo.skaleConfig.nodeInfo.logLevelProposal = process.env.SKALED_LOG_LEVEL;
+        console.log('Changed skaled log level: ' + process.env.SKALED_LOG_LEVEL);
+    }
+
     jsonFileSave( strPathSkaledJSON, jo, true );
     console.log("Done.");
 }
