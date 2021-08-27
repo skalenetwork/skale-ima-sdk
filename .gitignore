@@ -4,3 +4,5 @@ dev_dir/
 .DS_Store
 IMA/
 contracts_data/*
+db/*
+ssl/*

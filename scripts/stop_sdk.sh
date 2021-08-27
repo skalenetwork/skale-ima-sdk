@@ -14,4 +14,6 @@ if [ $CLEANUP == 'True' ]; then
     rm -rf $IMA_SDK_DIR/contracts_data/proxyMainnet.json
     rm -rf $IMA_SDK_DIR/contracts_data/proxySchain_Bob.json
     rm -rf $IMA_SDK_DIR/contracts_data/proxySchain.json
+    rm -rf $IMA_SDK_DIR/db/
+    mkdir $IMA_SDK_DIR/db/ && touch $IMA_SDK_DIR/db/.keep
 fi
