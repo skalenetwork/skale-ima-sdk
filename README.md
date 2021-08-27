@@ -4,7 +4,7 @@
 
 This repo provides a SDK for running IMA on a single-node SKALE chain. This SDK operates without BLS signature verification.
 
-## Simple usage example
+## Usage guide
 
 ### Prerequisites
 
@@ -26,108 +26,65 @@ nano .env
 export $(grep -v '^#' .env | xargs)
 ```
 
-4. Execute to run SDK and deploy contracts:
+4. Put SSL cert & key to `ssl` folder (names should be `ssl_key` and `ssl_cert`):
+
+*This step is optional*
+*You should have SSL certs and setup redirects by yourself*
+
+```bash
+cp privkey.pem ~/skale-ima-sdk/ssl/ssl_key
+cp cert.pem ~/skale-ima-sdk/ssl/ssl_cert
+```
+
+5. Execute to run SDK and deploy contracts:
 
 ```bash
 WAIT=True bash scripts/run_sdk.sh
 ```
 
-5. When you're done, stop SDK:
+Now sChain and Mainnet parts are available:
+
+```bash
+# sChain
+http://$IP_ADDRESS:15000
+http://$DOMAIN_NAME/schain # if you have SSL certs and domain name
+https://$DOMAIN_NAME/schain # if you have SSL certs and domain name
+
+# Mainnet
+http://$IP_ADDRESS:1545
+http://$DOMAIN_NAME/mainnet # if you have SSL certs and domain name
+https://$DOMAIN_NAME/mainnet # if you have SSL certs and domain name
+```
+
+When you're done, stop SDK:
 
 ```bash
 CLEANUP=True  bash scripts/stop_sdk.sh
 ```
 
-## Prerequisites
+## Helpful info
 
-* gcc/g++ 7
-* Docker
-* nodejs v10.X
-* yarn
-* truffle@5.0.12
+### Install Nodejs
 
-On Ubuntu:
-
-```shell
-sudo apt-get update && add-apt-repository ppa:ubuntu-toolchain-r/test && \
-    apt-get install -y apt-utils \
-    build-essential \
-    docker.io \
-    g++-7 \
-    gcc-7 \
-    make  && \
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
-        --slave /usr/bin/g++ g++ /usr/bin/g++-7 && \
-    sudo update-alternatives --config gcc && \
-    gcc --version && \
-    g++ --version
-
-# Install Nodejs, yarn
-
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - && \
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - && \
     sudo apt-get install -y nodejs && \
-    node --version && \
-    npm --version && \
-    sudo npm install -g yarn && \
-    yarn --version
+    node --version
 
-# Install Truffle
+### Clone this repo
 
-sudo npm install --unsafe-perm -g truffle@5.0.12
-truffle --version
-```
-
-## Clone this repo
-
-```shell
+```bash
 git clone https://github.com/skalenetwork/skale-ima-sdk.git
 cd skale-ima-sdk
 ```
 
-## Configuration
-
-By default, basic provided configuration uses Rinkeby. This can be changed by editing `.env` file and providing alternative **Ethereum** URL pointing to other network like local ganache. Negative value `-4` should be specified in the `CHAIN_ID_MAIN_NET` variable for local ganache network. 
-
-## Setup
-
-Modify environment variables in the .env file and load.
-
-```shell
-source .env
-```
-
-Install all required parts and source code:
-
-```shell
-./init.sh
-```
-
-Build the docker container:
-
-```shell
-./build.sh
-```
-
-## Run
-
-To run IMA with Rinkeby:
-
-```shell
-script /dev/null
-screen -S IMA-SKALE-Chain-Box -d -m bash -c "./run.sh"
-```
-
 ## Access ABIs
 
-The ABIs geenerated for the IMA smart contracts deployed to mainnet/testnet and the SKALE Chain can be found in the following folder:
+The ABIs generated for the IMA smart contracts deployed to mainnet/testnet and the SKALE Chain can be found in the following folder:
 
-```shell
-
-cd skale-ima-sdk/dev_dir/IMA/proxy/data/
-
+```bash
+skale-ima-sdk/contracts_data/proxyMainnet.json # Mainnet part
+skale-ima-sdk/contracts_data/proxySchain_Bob.json # sChain part
 ```
-  Mainnet ABI: `proxyMainnet.json` 
-  SKALE Chain ABI: `proxySchain_Bob.json`
 
 ## Development
 
