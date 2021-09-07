@@ -6,3 +6,6 @@ IMA/
 contracts_data/*
 db/*
 ssl/*
+
+additional_accounts.json
+scripts/run_ganache.sh
