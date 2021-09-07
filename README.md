@@ -64,6 +64,27 @@ CLEANUP=True  bash scripts/stop_sdk.sh
 
 ## Helpful info
 
+### Pass additional accounts
+
+You can pass any number of additional accounts to the SDK.  
+All accounts will have pre-allocated ETH both on Mainnet and sChain sides.
+  
+To do that add `additional_accounts.json` file in the root of the project. Structure of the file:
+
+```json
+[
+    {
+        "private_key": "0x...",
+        "address": "0x.."
+    },
+    {
+        "private_key": "0x...",
+        "address": "0x.."
+    }
+    ...
+]
+```
+
 ### Install Nodejs
 
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - && \

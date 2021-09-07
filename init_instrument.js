@@ -90,50 +90,90 @@ function addAccount(config, address, amount="1000000000000000000000000000000") {
     if (address in config.accounts) {
         console.log('Address ' + address + ' is already in accounts section');
     } else {
-        jo.accounts[address] = {
+        config.accounts[address] = {
             "balance": amount
         }
         console.log('Added address: ' + address);
     }   
 }
 
+
+function processGanacheTemplate(templatePath, destPath, value) {
+    fs.readFile(templatePath, 'utf8', function (err,data) {
+        if (err) {
+          return console.log(err);
+        }
+        var result = data.replace(/{{ additionalAccounts }}/g, value);
+        fs.writeFile(destPath, result, 'utf8', function (err) {
+           if (err) return console.log(err);
+        });
+    });
+}
+
 function updateSkaledConfig() {
     console.log("Updating skaled configuration file");
     const strPathSkaledJSON = normalizePath(path.join( __dirname, "config0.json"));
+    const additionalAccountsPath = normalizePath(path.join( __dirname, "additional_accounts.json"));
     
     if(!fileExists(strPathSkaledJSON)) {
         console.log( "CRITICAL ERROR: File \"" + strPathSkaledJSON + "\" was not found." );
         process.exit(1);
     }
     
-    let jo = jsonFileLoad(strPathSkaledJSON, null, true);
+    let config = jsonFileLoad(strPathSkaledJSON, null, true);
     
     if( process.env.CHAIN_ID_S_CHAIN && process.env.CHAIN_ID_S_CHAIN.length > 0 ) {
-        jo.params.chainID = process.env.CHAIN_ID_S_CHAIN;
+        config.params.chainID = process.env.CHAIN_ID_S_CHAIN;
         console.log('Updated chainId: ' + process.env.CHAIN_ID_S_CHAIN);
     }
 
     if( process.env.TEST_ADDRESS && process.env.TEST_ADDRESS.length > 0 ) {
-        jo.skaleConfig.sChain.schainOwner = process.env.TEST_ADDRESS;
+        config.skaleConfig.sChain.schainOwner = process.env.TEST_ADDRESS;
         console.log('Updated sChain owner: ' + process.env.TEST_ADDRESS);
-        addAccount(jo, process.env.TEST_ADDRESS);
+        addAccount(config, process.env.TEST_ADDRESS);
     }
 
     if( process.env.ACCOUNT_FOR_SCHAIN && process.env.ACCOUNT_FOR_SCHAIN.length > 0 ) {
-        addAccount(jo, process.env.ACCOUNT_FOR_SCHAIN);
+        addAccount(config, process.env.ACCOUNT_FOR_SCHAIN);
+    }
+
+    if(fileExists(additionalAccountsPath)) {
+        let additionalAccounts = jsonFileLoad(additionalAccountsPath, null, true);
+        for (const account of additionalAccounts) {
+            addAccount(config, account.address);
+        }
     }
 
     if( process.env.SKALED_LOG_LEVEL && process.env.SKALED_LOG_LEVEL.length > 0 ) {
-        jo.skaleConfig.nodeInfo.logLevel = process.env.SKALED_LOG_LEVEL;
-        jo.skaleConfig.nodeInfo.logLevelProposal = process.env.SKALED_LOG_LEVEL;
+        config.skaleConfig.nodeInfo.logLevel = process.env.SKALED_LOG_LEVEL;
+        config.skaleConfig.nodeInfo.logLevelProposal = process.env.SKALED_LOG_LEVEL;
         console.log('Changed skaled log level: ' + process.env.SKALED_LOG_LEVEL);
     }
 
-    jsonFileSave( strPathSkaledJSON, jo, true );
+    jsonFileSave( strPathSkaledJSON, config, true );
     console.log("Done.");
+}
+
+function updateGanacheScript() {
+    const additionalAccountsPath = normalizePath(path.join( __dirname, "additional_accounts.json"));
+    const runGanacheTemplatePath = normalizePath(path.join( __dirname, "scripts/run_ganache.sh.template"));
+    const runGanacheScriptPath = normalizePath(path.join( __dirname, "scripts/run_ganache.sh"));
+    if(!fileExists(additionalAccountsPath)) {
+        processGanacheTemplate(runGanacheTemplatePath, runGanacheScriptPath, '\\');
+        return;
+    }
+
+    let additionalAccounts = jsonFileLoad(additionalAccountsPath, null, true);
+    let accountsGanache = []
+    for (const account of additionalAccounts) {
+        accountsGanache.push('--account="' + account.private_key + ',100000000000000000000000000" \\')
+    }
+    const accountsGanacheStr = accountsGanache.join('\n')
+    processGanacheTemplate(runGanacheTemplatePath, runGanacheScriptPath, accountsGanacheStr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
 updateSkaledConfig();
+updateGanacheScript();

@@ -40,7 +40,10 @@ services:
     ganache:
         image: trufflesuite/ganache-cli:beta
         container_name: ima_sdk_ganache
-        command: --db /app/db --account="0x${TEST_PRIVATE_KEY},100000000000000000000000000" --account="0x${SDK_PRIVATE_KEY},100000000000000000000000000" -l 80000000
+        entrypoint: sh /scripts/run_ganache.sh
+        environment:
+            SDK_PRIVATE_KEY: $SDK_PRIVATE_KEY
+            TEST_PRIVATE_KEY: $TEST_PRIVATE_KEY
         ports:
             - "1545:8545"
             - "1546:8546"
@@ -48,6 +51,7 @@ services:
             - ima
         volumes:
             - ./db:/app/db
+            - ./scripts:/scripts
     nginx:
         image: nginx:1.21.1
         container_name: ima_sdk_nginx

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+node /app/ganache-core.docker.cli.js --db /app/db \
+--account="0x${TEST_PRIVATE_KEY},100000000000000000000000000" \
+--account="0x${SDK_PRIVATE_KEY},100000000000000000000000000" \
+{{ additionalAccounts }}
+-l 80000000
