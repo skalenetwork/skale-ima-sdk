@@ -12,7 +12,7 @@ services:
             URL_W3_S_CHAIN: http://127.0.0.1:15000
             URL_W3_ETHEREUM: http://ganache:8545
             CHAIN_ID_S_CHAIN: "0x12345"
-            CHAIN_ID_MAIN_NET: "0x539"
+            CHAIN_ID_MAIN_NET: "0x5661"
             NETWORK_FOR_ETHEREUM: "mainnet"
             NETWORK_FOR_SCHAIN: "schain"
             NO_NTP_CHECK: "True"
