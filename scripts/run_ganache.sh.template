@@ -4,5 +4,6 @@ node /app/ganache-core.docker.cli.js --db /app/db \
 --account="0x${TEST_PRIVATE_KEY},100000000000000000000000000" \
 --account="0x${SDK_PRIVATE_KEY},100000000000000000000000000" \
 {{ additionalAccounts }}
+--chainId 0x561 \
+--networkId 0x561 \
 -l 80000000
---chainId 0x5661

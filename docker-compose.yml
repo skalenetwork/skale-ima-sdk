@@ -38,7 +38,7 @@ services:
         networks:
             - ima
     ganache:
-        image: trufflesuite/ganache-cli:beta
+        image: trufflesuite/ganache-cli:latest
         container_name: ima_sdk_ganache
         entrypoint: sh /scripts/run_ganache.sh
         environment:
