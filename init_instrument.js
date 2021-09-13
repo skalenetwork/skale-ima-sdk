@@ -26,6 +26,13 @@ const path = require( "path" );
 const os = require( "os" );
 
 
+const DEFAULT_ALLOCATED_STORAGE_BYTES = '10737418240';
+const REQUIRED_ENV_VARS = ['TEST_ADDRESS', 'SDK_ADDRESS'];
+const CONTEXT_CONTRACT_ADDRESS = '0xD2001000000000000000000000000000000000D2';
+
+const NGINX_SSL_CONFIG = 'listen 443 ssl;\n    ssl_certificate     /ssl/ssl_cert;\n    ssl_certificate_key /ssl/ssl_key;'
+
+
 function normalizePath( strPath ) {
     strPath = strPath.replace( /^~/, os.homedir() );
     strPath = path.normalize( strPath );
@@ -103,6 +110,16 @@ function addAccount(config, address, amount="1000000000000000000000000000000") {
     }   
 }
 
+function addContract(config, contract) {
+    config.accounts[contract.address] = {
+        "balance": "0",
+        "code": contract.bytecode,
+        "storage": contract.storage,
+        "nonce": "0"
+    }
+    console.log('Added contract: ' + contract.address);
+}
+
 
 function processGanacheTemplate(templatePath, destPath, value) {
     fs.readFile(templatePath, 'utf8', function (err,data) {
@@ -110,6 +127,18 @@ function processGanacheTemplate(templatePath, destPath, value) {
           return console.log(err);
         }
         var result = data.replace(/{{ additionalAccounts }}/g, value);
+        fs.writeFile(destPath, result, 'utf8', function (err) {
+           if (err) return console.log(err);
+        });
+    });
+}
+
+function processNginxTemplate(templatePath, destPath, value) {
+    fs.readFile(templatePath, 'utf8', function (err,data) {
+        if (err) {
+          return console.log(err);
+        }
+        var result = data.replace(/{{ ssl }}/g, value);
         fs.writeFile(destPath, result, 'utf8', function (err) {
            if (err) return console.log(err);
         });
@@ -144,6 +173,10 @@ function updateSkaledConfig() {
         addAccount(config, process.env.ACCOUNT_FOR_SCHAIN);
     }
 
+    if( process.env.SDK_ADDRESS && process.env.SDK_ADDRESS.length > 0 ) {
+        addAccount(config, process.env.SDK_ADDRESS);
+    }
+
     if(fileExists(additionalAccountsPath)) {
         let additionalAccounts = jsonFileLoad(additionalAccountsPath, null, true);
         for (const account of additionalAccounts) {
@@ -156,6 +189,11 @@ function updateSkaledConfig() {
         config.skaleConfig.nodeInfo.logLevelProposal = process.env.SKALED_LOG_LEVEL;
         console.log('Changed skaled log level: ' + process.env.SKALED_LOG_LEVEL);
     }
+
+    const allocatedStorage = process.env.FS_BYTES || DEFAULT_ALLOCATED_STORAGE_BYTES;
+    updateFsConfig(config, process.env.TEST_ADDRESS, allocatedStorage);
+
+    updateContextContract(config, process.env.TEST_ADDRESS);
 
     jsonFileSave( strPathSkaledJSON, config, true );
     console.log("Done.");
@@ -181,5 +219,50 @@ function updateGanacheScript() {
 }
 
 
+function updateNginxConfig() {
+    const nginxConfigTemplatePath = normalizePath(path.join( __dirname, "conf/nginx.conf.template"));
+    const nginxConfigPath = normalizePath(path.join( __dirname, "conf/nginx.conf"));
+
+    const sslCertPath = normalizePath(path.join( __dirname, "ssl/ssl_cert"));
+    const sslKeyPath = normalizePath(path.join( __dirname, "ssl/ssl_key"));
+    if(!fileExists(sslCertPath) || !fileExists(sslKeyPath)) {
+        processNginxTemplate(nginxConfigTemplatePath, nginxConfigPath, '');
+        return;
+    }
+    processNginxTemplate(nginxConfigTemplatePath, nginxConfigPath, NGINX_SSL_CONFIG);
+}
+
+
+
+
+function updateFsConfig(config, ownerAddress, allocatedStorage) {
+    const fsArtifactsPath = normalizePath(path.join( __dirname, "conf/fs-artifacts.json"));
+    const fsArtifacts = jsonFileLoad(fsArtifactsPath, null, true);
+    let predeployedConfig = fsArtifacts["predeployedConfig"];
+    predeployedConfig['proxyAdmin']['storage']['0x0'] = ownerAddress;
+    predeployedConfig['filestorageProxy']['storage']['0x0'] = allocatedStorage;
+    addContract(config, predeployedConfig['filestorageProxy']);
+    addContract(config, predeployedConfig['proxyAdmin']);
+    addContract(config, predeployedConfig['filestorageImplementation']);
+}
+
+function updateContextContract(config, ownerAddress) {
+    config.accounts[CONTEXT_CONTRACT_ADDRESS].storage['0x0'] = ownerAddress;
+    console.log('Updated sChain owner in context contract!');
+}
+
+
+function checkEnvVars() {
+    for (const envVar of REQUIRED_ENV_VARS) {
+        if (!process.env[envVar]) {
+            console.log( "CRITICAL ERROR: ENV VAR \"" + envVar + "\" was not found." );
+            process.exit(1);
+        }
+    }
+}
+
+
+checkEnvVars();
 updateSkaledConfig();
 updateGanacheScript();
+updateNginxConfig();

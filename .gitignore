@@ -9,3 +9,4 @@ ssl/*
 
 additional_accounts.json
 scripts/run_ganache.sh
+conf/nginx.conf
