@@ -851,8 +851,8 @@
             "basePort": 1231,
             "bindIP6": "::",
             "basePort6": 1231,
-            "logLevel": "trace",
-            "logLevelProposal": "trace",
+            "logLevel": "info",
+            "logLevelProposal": "info",
             "adminOrigins": [
                 "*"
             ],

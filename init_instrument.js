@@ -1,9 +1,30 @@
+/**
+ * @license
+ * SKALE skale-ima-sdk
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * @file init_instrument.js
+ * @copyright SKALE Labs 2021-Present
+*/
+
 const fs = require( "fs" );
 const path = require( "path" );
 const os = require( "os" );
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
 
 function normalizePath( strPath ) {
     strPath = strPath.replace( /^~/, os.homedir() );
@@ -11,6 +32,7 @@ function normalizePath( strPath ) {
     strPath = path.resolve( strPath );
     return strPath;
 }
+
 
 function fileExists( strPath ) {
     try {
@@ -23,24 +45,6 @@ function fileExists( strPath ) {
     return false;
 }
 
-function fileLoad( strPath, strDefault ) {
-    strDefault = strDefault || "";
-    if( !fileExists( strPath ) )
-        return strDefault;
-    try {
-        const s = fs.readFileSync( strPath );
-        return s;
-    } catch ( err ) {}
-    return strDefault;
-}
-
-function fileSave( strPath, s ) {
-    try {
-        fs.writeFileSync( strPath, s );
-        return true;
-    } catch ( err ) {}
-    return false;
-}
 
 function jsonFileLoad( strPath, joDefault, bLogOutput ) {
     if( bLogOutput == undefined || bLogOutput == null )
@@ -68,6 +72,7 @@ function jsonFileLoad( strPath, joDefault, bLogOutput ) {
     return joDefault;
 }
 
+
 function jsonFileSave( strPath, jo, bLogOutput ) {
     if( bLogOutput == undefined || bLogOutput == null )
         bLogOutput = false;
@@ -85,6 +90,7 @@ function jsonFileSave( strPath, jo, bLogOutput ) {
     }
     return false;
 }
+
 
 function addAccount(config, address, amount="1000000000000000000000000000000") {
     if (address in config.accounts) {
@@ -109,6 +115,7 @@ function processGanacheTemplate(templatePath, destPath, value) {
         });
     });
 }
+
 
 function updateSkaledConfig() {
     console.log("Updating skaled configuration file");
@@ -154,6 +161,7 @@ function updateSkaledConfig() {
     console.log("Done.");
 }
 
+
 function updateGanacheScript() {
     const additionalAccountsPath = normalizePath(path.join( __dirname, "additional_accounts.json"));
     const runGanacheTemplatePath = normalizePath(path.join( __dirname, "scripts/run_ganache.sh.template"));
@@ -172,8 +180,6 @@ function updateGanacheScript() {
     processGanacheTemplate(runGanacheTemplatePath, runGanacheScriptPath, accountsGanacheStr);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
 
 updateSkaledConfig();
 updateGanacheScript();

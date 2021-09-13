@@ -16,7 +16,7 @@ services:
             NETWORK_FOR_ETHEREUM: "mainnet"
             NETWORK_FOR_SCHAIN: "schain"
             NO_NTP_CHECK: "True"
-        image: skalenetwork/ima_sdk:0.0.0
+        image: skalenetwork/ima_sdk:0.1.0
         container_name: ima_sdk
         ports:
             - "15000:15000"
