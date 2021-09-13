@@ -13,6 +13,8 @@ _DATA_DIR=$DIR/data_dir
 mkdir -p "${_DATA_DIR}" || true > /dev/null
 mkdir -p "${_DATA_DIR}/ipc" || true > /dev/null
 mkdir -p "${_DATA_DIR}/node" || true > /dev/null
+mkdir -p "${_DATA_DIR}/filestorage" || true > /dev/null
+
 _DEV_DIR=$DIR/dev_dir
 mkdir -p "${_DEV_DIR}" || true > /dev/null
 cp $DIR/config0.json "${_DEV_DIR}/config0.json" || true > /dev/null
