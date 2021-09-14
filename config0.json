@@ -20,7 +20,8 @@
         "minimumDifficulty": "0x020000",
         "networkID": "12313219",
         "skaleUnlimitedForkBlock": "0x0",
-        "tieBreakingGas": false
+        "tieBreakingGas": false,
+        "externalGasDifficulty": "0x01"
     },
     "unddos": {
         "origins": [
