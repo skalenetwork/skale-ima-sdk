@@ -101,25 +101,25 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
 
-if [ ! -f /data_dir/all_ima_registration.txt ]; then
-    echo " "
-    echo "Will register IMA..."
-    touch /data_dir/all_ima_registration.txt
-    cd /IMA/agent || exit
-    node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
-        --register \
-        --url-main-net=$URL_W3_ETHEREUM \
-        --url-s-chain=$URL_W3_S_CHAIN \
-        --id-main-net=Mainnet \
-        --id-s-chain=Bob \
-        --cid-main-net=$CHAIN_ID_MAIN_NET \
-        --cid-s-chain=$CHAIN_ID_S_CHAIN \
-        --abi-main-net=../proxy/data/proxyMainnet.json \
-        --abi-s-chain=../proxy/data/proxySchain_Bob.json \
-        --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
-        --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN &>> /data_dir/all_ima_registration.txt
-    echo "Successfully registered IMA."
-fi
+# if [ ! -f /data_dir/all_ima_registration.txt ]; then
+#     echo " "
+#     echo "Will register IMA..."
+#     touch /data_dir/all_ima_registration.txt
+#     cd /IMA/agent || exit
+#     node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
+#         --register \
+#         --url-main-net=$URL_W3_ETHEREUM \
+#         --url-s-chain=$URL_W3_S_CHAIN \
+#         --id-main-net=Mainnet \
+#         --id-s-chain=Bob \
+#         --cid-main-net=$CHAIN_ID_MAIN_NET \
+#         --cid-s-chain=$CHAIN_ID_S_CHAIN \
+#         --abi-main-net=../proxy/data/proxyMainnet.json \
+#         --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+#         --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
+#         --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN &>> /data_dir/all_ima_registration.txt
+#     echo "Successfully registered IMA."
+# fi
 
 echo " "
 echo "Will start IMA agent transfer loop..."
