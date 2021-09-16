@@ -2,7 +2,7 @@
 
 [![Discord](https://img.shields.io/discord/534485763354787851.svg)](https://discord.gg/vvUtWJB)
 
-This repo provides a SDK for running IMA on a single-node SKALE chain. This SDK operates without BLS signature verification.
+IMA-SDK is a tool for dApp developers that emulates SKALE Node + IMA env on a single machine for dev purposes. This article will demonstrate how to setup and use the IMA-SDK in combination with IMA-JS library for dApp development.
 
 ## Usage guide
 
@@ -59,7 +59,7 @@ https://$DOMAIN_NAME/mainnet # if you have SSL certs and domain name
 When you're done, stop SDK:
 
 ```bash
-CLEANUP=True  bash scripts/stop_sdk.sh
+CLEANUP=True bash scripts/stop_sdk.sh
 ```
 
 ## Helpful info
