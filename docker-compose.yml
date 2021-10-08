@@ -65,6 +65,8 @@ services:
             - ./data_dir/filestorage:/filestorage:ro
         networks:
             - ima
+        extra_hosts:
+            host.docker.internal: host-gateway
 
 networks:
     ima:
