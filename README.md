@@ -62,6 +62,11 @@ When you're done, stop SDK:
 CLEANUP=True bash scripts/stop_sdk.sh
 ```
 
+### Usage
+
+Mainnet chain ID: `0x561`
+sChain chain ID: `0x12345`
+
 ## Helpful info
 
 ### Pass additional accounts
