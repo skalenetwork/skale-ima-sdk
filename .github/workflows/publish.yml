@@ -26,6 +26,8 @@ jobs:
         node-version: '14'
     - name: Install deps
       run: sudo apt update && sudo apt install build-essential && sudo npm install -g node-gyp
+    - name: Setup IMA
+      run: bash ./scripts/setup_ima.sh
     - name: Build and publish container
       run: |
         export BRANCH=${GITHUB_REF##*/}
