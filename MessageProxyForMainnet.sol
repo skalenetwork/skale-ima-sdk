@@ -31,6 +31,13 @@ import "../MessageProxy.sol";
 import "./SkaleManagerClient.sol";
 import "./CommunityPool.sol";
 
+interface IMessageProxyForMainnetInitializeFunction is IMessageProxyForMainnet {
+    function initializeAllRegisteredContracts(
+        bytes32 schainHash,
+        address[] calldata contracts
+    ) external;
+}
+
 
 /**
  * @title Message Proxy for Mainnet
@@ -42,9 +49,10 @@ import "./CommunityPool.sol";
  * nodes in the chain. Since Ethereum Mainnet has no BLS public key, mainnet
  * messages do not need to be signed.
  */
-contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessageProxyForMainnet {
+contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessageProxyForMainnetInitializeFunction {
 
     using AddressUpgradeable for address;
+    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     /**
      * 16 Agents
@@ -64,6 +72,8 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
 
     uint256 public headerMessageGasCost;
     uint256 public messageGasCost;
+    mapping(bytes32 => EnumerableSetUpgradeable.AddressSet) private _registryContracts;
+    string public version;
 
     /**
      * @dev Emitted when gas cost for message header was changed.
@@ -80,6 +90,30 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         uint256 oldValue,
         uint256 newValue
     );
+
+    /**
+     * @dev Allows DEFAULT_ADMIN_ROLE to initialize registered contracts
+     * Notice - this function will be executed only once during upgrade
+     * 
+     * Requirements:
+     * 
+     * `msg.sender` should have DEFAULT_ADMIN_ROLE
+     */
+    function initializeAllRegisteredContracts(
+        bytes32 schainHash,
+        address[] calldata contracts
+    ) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Sender is not authorized");
+        for (uint256 i = 0; i < contracts.length; i++) {
+            if (
+                deprecatedRegistryContracts[schainHash][contracts[i]] &&
+                !_registryContracts[schainHash].contains(contracts[i])
+            ) {
+                _registryContracts[schainHash].add(contracts[i]);
+                delete deprecatedRegistryContracts[schainHash][contracts[i]];
+            }
+        }
+    }
 
     /**
      * @dev Allows `msg.sender` to connect schain with MessageProxyOnMainnet for transferring messages.
@@ -164,7 +198,7 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         Signature calldata sign
     )
         external
-        override
+        override(IMessageProxy, MessageProxy)
     {
         uint256 gasTotal = gasleft();
         bytes32 fromSchainHash = keccak256(abi.encodePacked(fromSchainName));
@@ -181,7 +215,7 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         uint notReimbursedGas = 0;
         for (uint256 i = 0; i < messages.length; i++) {
             gasTotal = gasleft();
-            if (registryContracts[bytes32(0)][messages[i].destinationContract]) {
+            if (isContractRegistered(bytes32(0), messages[i].destinationContract)) {
                 address receiver = _getGasPayer(fromSchainHash, messages[i], startingCounter + i);
                 _callReceiverContract(fromSchainHash, messages[i], startingCounter + i);
                 notReimbursedGas += communityPool.refundGasByUser(
@@ -224,6 +258,19 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
     }
 
     /**
+     * @dev Sets new version of contracts on mainnet
+     * 
+     * Requirements:
+     * 
+     * - `msg.sender` must be granted DEFAULT_ADMIN_ROLE.
+     */
+    function setVersion(string calldata newVersion) external override {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "DEFAULT_ADMIN_ROLE is required");
+        emit VersionUpdated(version, newVersion);
+        version = newVersion;
+    }
+
+    /**
      * @dev Creates a new MessageProxyForMainnet contract.
      */
     function initialize(IContractManager contractManagerOfSkaleManagerValue) public virtual override initializer {
@@ -231,7 +278,7 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         MessageProxy.initializeMessageProxy(1e6);
         headerMessageGasCost = 70000;
         messageGasCost = 9000;
-    }    
+    }
 
     /**
      * @dev Checks whether chain is currently connected.
@@ -273,5 +320,14 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
 
     function _checkSchainBalance(bytes32 schainHash) internal view returns (bool) {
         return true;
+    }
+
+    function _getRegistryContracts()
+        internal
+        view
+        override
+        returns (mapping(bytes32 => EnumerableSetUpgradeable.AddressSet) storage)
+    {
+        return _registryContracts;
     }
 }
