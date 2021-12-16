@@ -5,7 +5,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y dialog apt-utils psmisc git
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y nodejs
-RUN apt update && apt install build-essential libssl0.9.8 libssl-dev liblua5.1-dev && npm install -g node-gyp
+RUN apt update && apt install build-essential && npm install -g node-gyp
 RUN node --version
 RUN npm --version
 RUN rm -rf /root/tmp
