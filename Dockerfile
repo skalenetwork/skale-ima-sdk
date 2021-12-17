@@ -1,10 +1,11 @@
-FROM skalenetwork/schain:3.7.5-beta.4
+FROM skalenetwork/schain:3.7.5-stable.2
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=true
 # ARG DEBIAN_FRONTEND=noninteractive
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y dialog apt-utils psmisc git
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y nodejs
+RUN apt update && apt install build-essential && npm install -g node-gyp
 RUN node --version
 RUN npm --version
 RUN rm -rf /root/tmp

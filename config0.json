@@ -982,6 +982,8 @@
             "httpsRpcPort6": 15010,
             "wsRpcPort6": 15040,
             "wssRpcPort6": 15050,
+            "infoHttpRpcPort": 16010,
+            "infoHttpsRpcPort": 16020,
             "acceptors": 1,
             "max-connections": 0,
             "max-http-queues": 0,
