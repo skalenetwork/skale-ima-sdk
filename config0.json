@@ -766,6 +766,16 @@
                 "startingBlock": "0x0"
             }
         },
+        "0000000000000000000000000000000000000018": {
+            "precompiled": {
+                "name": "getBlockRandom",
+                "linear": {
+                    "base": 15,
+                    "word": 0
+                },
+                "startingBlock": "0x0"
+            }
+        },
         "0xc033b369416c9ecd8e4a07aafa8b06b4107419e2": {
             "balance": "0",
             "nonce": "0",
