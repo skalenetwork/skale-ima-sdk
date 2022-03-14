@@ -1,0 +1,5 @@
+tasks:
+  - name: Run IMA SDK
+    init: WAIT=True bash scripts/run_sdk.sh
+    env:
+      TEST: test
