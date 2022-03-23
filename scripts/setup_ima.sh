@@ -3,7 +3,7 @@
 set -e
 
 # : "${IMA_VERSION?Need to set IMA_VERSION}"
-IMA_VERSION="1.1.2-beta.0"
+IMA_VERSION="1.1.2-beta.1"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 _IMA_DIR=$DIR/../IMA
