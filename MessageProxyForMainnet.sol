@@ -74,6 +74,7 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
     uint256 public messageGasCost;
     mapping(bytes32 => EnumerableSetUpgradeable.AddressSet) private _registryContracts;
     string public version;
+    bool public override messageInProgress;
 
     /**
      * @dev Emitted when gas cost for message header was changed.
@@ -90,6 +91,16 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         uint256 oldValue,
         uint256 newValue
     );
+
+    /**
+     * @dev Reentrancy guard for postIncomingMessages.
+     */
+    modifier messageInProgressLocker() {
+        require(!messageInProgress, "Message is in progress");
+        messageInProgress = true;
+        _;
+        messageInProgress = false;
+    }
 
     /**
      * @dev Allows DEFAULT_ADMIN_ROLE to initialize registered contracts
@@ -199,6 +210,7 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
     )
         external
         override(IMessageProxy, MessageProxy)
+        messageInProgressLocker
     {
         uint256 gasTotal = gasleft();
         bytes32 fromSchainHash = keccak256(abi.encodePacked(fromSchainName));
@@ -209,10 +221,14 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
             startingCounter == connectedChains[fromSchainHash].incomingMessageCounter,
             "Starting counter is not equal to incoming message counter");
 
-        require(_verifyMessages(fromSchainName, _hashedArray(messages), sign), "Signature is not verified");
+        require(_verifyMessages(
+            fromSchainName,
+            _hashedArray(messages, startingCounter, fromSchainName), sign),
+            "Signature is not verified");
         uint additionalGasPerMessage = 
             (gasTotal - gasleft() + headerMessageGasCost + messages.length * messageGasCost) / messages.length;
         uint notReimbursedGas = 0;
+        connectedChains[fromSchainHash].incomingMessageCounter += messages.length;
         for (uint256 i = 0; i < messages.length; i++) {
             gasTotal = gasleft();
             if (isContractRegistered(bytes32(0), messages[i].destinationContract)) {
@@ -229,7 +245,6 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
                 notReimbursedGas += gasTotal - gasleft() + additionalGasPerMessage;
             }
         }
-        connectedChains[fromSchainHash].incomingMessageCounter += messages.length;
         communityPool.refundGasBySchainWallet(fromSchainHash, payable(msg.sender), notReimbursedGas);
     }
 
@@ -302,6 +317,17 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         return super.isConnectedChain(schainName);
     }
 
+    // private
+
+    function _authorizeOutgoingMessageSender(bytes32 targetChainHash) internal view override {
+        require(
+            isContractRegistered(bytes32(0), msg.sender)
+                || isContractRegistered(targetChainHash, msg.sender)
+                || isSchainOwner(msg.sender, targetChainHash),
+            "Sender contract is not registered"
+        );        
+    }
+
     /**
      * @dev Converts calldata structure to memory structure and checks
      * whether message BLS signature is valid.
@@ -318,10 +344,17 @@ contract MessageProxyForMainnet is SkaleManagerClient, MessageProxy, IMessagePro
         return true;
     }
 
+    /**
+     * @dev Checks whether balance of schain wallet is sufficient for 
+     * for reimbursement custom message.
+     */
     function _checkSchainBalance(bytes32 schainHash) internal view returns (bool) {
         return true;
     }
 
+    /**
+     * @dev Returns list of registered custom extra contracts.
+     */
     function _getRegistryContracts()
         internal
         view
