@@ -1,0 +1,9 @@
+GitPython==3.1.14
+
+ima-predeployed==1.1.2b1
+etherbase-predeployed==1.0.0
+marionette-predeployed==1.0.0
+filestorage-predeployed==1.0.1b0
+config-controller-predeployed==1.0.0.dev6
+multisigwallet-predeployed==0.0.1a5
+predeployed-generator==1.0.0
