@@ -116,7 +116,7 @@ contract TokenManagerERC721WithMetadata is TokenManagerERC721 {
             _removeTransferredAmount(fromChainHash, token, tokenId);
             IERC721Upgradeable(token).transferFrom(address(this), receiver, tokenId);
         } else {
-            require("Break");
+            require(false, "Break");
             contractOnSchain.mint(receiver, tokenId);
             contractOnSchain.setTokenURI(tokenId, tokenURI);
         }
