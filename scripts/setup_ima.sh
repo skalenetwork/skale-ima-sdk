@@ -22,3 +22,4 @@ cd $_IMA_DIR \
 
 cp $DIR/../MessageProxyForMainnet.sol $_IMA_DIR/proxy/contracts/mainnet/MessageProxyForMainnet.sol
 cp $DIR/../SkaleManagerClient.sol $_IMA_DIR/proxy/contracts/mainnet/SkaleManagerClient.sol
+cp $DIR/../TokenManagerERC721WithMetadata.sol $_IMA_DIR/proxy/contracts/schain/TokenManagers/TokenManagerERC721WithMetadata.sol
