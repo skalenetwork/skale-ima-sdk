@@ -134,7 +134,7 @@ tail -f data_dir/all_ima_deploy_sc.txt      # Monitor IMA SKALE Chain deployment
 tail -f data_dir/all_ima_registration.txt   # Monitor IMA registration
 tail -f data_dir/all_ima_loop.txt           # Monitor IMA agent
 
-./clean.sh                                  # Remove data files for rebuild
+CLEANUP=True bash scripts/stop_sdk.sh       # Remove data files for rebuild
 docker ps                                   # Show running containers
 docker stop [NAMES]                         # Stop container before rebuilding
 ```
