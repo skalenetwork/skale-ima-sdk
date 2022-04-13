@@ -32,8 +32,13 @@ while [ ! -f $SCHAIN_CONTRACTS_ABI_PATH ]; do
         exit 1;
     fi
     if [ $COUNTER -ge 50 ]; then
-        echo "Contracts deployment taking too much time, printing deployment logs"
-        cat $IMA_SDK_DIR/data_dir/all_ima_deploy_sc.txt || true
+        echo "Contracts deployment taking too much time, printing deployment and skaled logs:"
+        echo "------------------------------------------------"
+        echo "Deploy logs:"
+        tail -n200 $IMA_SDK_DIR/data_dir/all_ima_deploy_sc.txt || true
+        echo "------------------------------------------------"
+        echo "skaled logs:"
+        tail -n200 $IMA_SDK_DIR/data_dir/all_skaled_output.txt || true
     fi
     COUNTER=$[COUNTER + 1];
     sleep $SLEEP_TIMEOUT;
