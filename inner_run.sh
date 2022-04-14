@@ -94,7 +94,7 @@ fi
 if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo " "
     echo "Will deploy IMA to S-Chain..."
-    sleep 20
+    sleep 45
     touch /data_dir/all_ima_deploy_sc.txt
     cd /IMA/proxy || exit
     ACCOUNT_FOR_SCHAIN=$TEST_ADDRESS PRIVATE_KEY_FOR_SCHAIN=$TEST_PRIVATE_KEY yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
