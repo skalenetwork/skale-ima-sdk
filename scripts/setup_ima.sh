@@ -22,4 +22,4 @@ cd $_IMA_DIR \
 
 cp $DIR/../MessageProxyForMainnet.sol $_IMA_DIR/proxy/contracts/mainnet/MessageProxyForMainnet.sol
 cp $DIR/../SkaleManagerClient.sol $_IMA_DIR/proxy/contracts/mainnet/SkaleManagerClient.sol
-cp $DIR/../skaleManagerSample.json $_IMA_DIR/proxy/data/skaleManager.json
+cp $DIR/../skaleManagerSample.json $_IMA_DIR/proxy/skaleManager.json
