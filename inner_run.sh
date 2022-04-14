@@ -134,6 +134,7 @@ node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --cid-s-chain=$CHAIN_ID_S_CHAIN \
     --abi-main-net=../proxy/data/proxyMainnet.json \
     --abi-s-chain=../proxy/data/proxySchain_Bob.json \
+    --abi-skale-manager=../proxy/data/skaleManager.json \
     --key-main-net=$PRIVATE_KEY_FOR_ETHEREUM \
     --key-s-chain=$PRIVATE_KEY_FOR_SCHAIN &> /data_dir/all_ima_loop.txt &
 echo "Successfully started IMA agent transfer loop"
