@@ -101,8 +101,7 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     echo "Successfully deployed IMA to SKALE Chain..."
 fi
 
-if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
-    echo " "
+if [ ! -f /IMA/agent/proxy/data/proxySchain_Bob.json ]; then
     echo "Will try to deploy IMA to S-Chain again..."
     sleep 45
     rm /data_dir/all_ima_deploy_sc.txt
