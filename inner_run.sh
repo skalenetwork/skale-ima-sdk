@@ -88,7 +88,7 @@ if [ ! -f /data_dir/all_ima_deploy_mn.txt ]; then
     fi
     yarn compile &>> /data_dir/all_ima_deploy_mn.txt
     yarn run deploy-to-mainnet &>> /data_dir/all_ima_deploy_mn.txt
-    echo "Successfully deployed IMA to Main Net..."
+    echo "Successfully deployed IMA to Main Net (first attempt)"
 fi
 
 if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
@@ -99,6 +99,17 @@ if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
     cd /IMA/proxy || exit
     ACCOUNT_FOR_SCHAIN=$TEST_ADDRESS PRIVATE_KEY_FOR_SCHAIN=$TEST_PRIVATE_KEY yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
     echo "Successfully deployed IMA to SKALE Chain..."
+fi
+
+if [ ! -f /data_dir/all_ima_deploy_sc.txt ]; then
+    echo " "
+    echo "Will try to deploy IMA to S-Chain again..."
+    sleep 45
+    rm /data_dir/all_ima_deploy_sc.txt
+    touch /data_dir/all_ima_deploy_sc.txt
+    cd /IMA/proxy || exit
+    ACCOUNT_FOR_SCHAIN=$TEST_ADDRESS PRIVATE_KEY_FOR_SCHAIN=$TEST_PRIVATE_KEY yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
+    echo "Successfully deployed IMA to SKALE Chain (second attempt)"
 fi
 
 # if [ ! -f /data_dir/all_ima_registration.txt ]; then
