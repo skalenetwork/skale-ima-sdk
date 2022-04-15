@@ -111,6 +111,16 @@ if [ ! -f /IMA/proxy/data/proxySchain_Bob.json ]; then
     echo "Successfully deployed IMA to SKALE Chain (second attempt)"
 fi
 
+if [ ! -f /IMA/proxy/data/proxySchain_Bob.json ]; then
+    echo "Will try to deploy IMA to S-Chain again..."
+    sleep 45
+    rm /data_dir/all_ima_deploy_sc.txt
+    touch /data_dir/all_ima_deploy_sc.txt
+    cd /IMA/proxy || exit
+    ACCOUNT_FOR_SCHAIN=$TEST_ADDRESS PRIVATE_KEY_FOR_SCHAIN=$TEST_PRIVATE_KEY yarn run deploy-to-schain &>> /data_dir/all_ima_deploy_sc.txt
+    echo "Successfully deployed IMA to SKALE Chain (third attempt)"
+fi
+
 # if [ ! -f /data_dir/all_ima_registration.txt ]; then
 #     echo " "
 #     echo "Will register IMA..."
