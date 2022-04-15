@@ -24,6 +24,8 @@ cp "$DIR/.env" "${_DEV_DIR}/.env" || true > /dev/null
 rm -f "${_DEV_DIR}/*.pem" || true > /dev/null
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout "${_DEV_DIR}/key.pem" -out "${_DEV_DIR}/cert.pem" &> "${_DEV_DIR}/ssl_init_log.txt"
 
+: "${SDK_VERSION?Need to set SDK_VERSION}"
+
 if [ "$NO_NGINX" == 'True' ]; then
     docker-compose up -d sdk ganache
 else
