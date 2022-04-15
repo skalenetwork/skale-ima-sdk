@@ -142,13 +142,8 @@ echo "Successfully started IMA agent transfer loop"
 #
 #
 echo " "
-echo "Press any key to stop this docker container"
-while [ true ] ; do
-    read -t 3 -n 1
-    if [ $? = 0 ] ; then
-        break # exit ;
-    fi
-done
+echo "Press Ctrl+C to stop this docker container"
+sleep infinity
 #
 #
 #
