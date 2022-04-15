@@ -21,6 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update
 RUN npm install --quiet --no-progress --unsafe-perm -g truffle@5.0.12
 
 COPY IMA /IMA
+COPY skaleManagerSample.json /skaleManagerSample.json
 RUN cd /IMA && yarn install
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
