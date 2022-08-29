@@ -152,6 +152,7 @@ node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
     --id-s-chain=Bob \
     --cid-main-net=$CHAIN_ID_MAIN_NET \
     --cid-s-chain=$CHAIN_ID_S_CHAIN \
+    --auto-exit=0 \
     --abi-main-net=../proxy/data/proxyMainnet.json \
     --abi-s-chain=../proxy/data/proxySchain_Bob.json \
     --abi-skale-manager=/skaleManagerSample.json \
