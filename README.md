@@ -12,6 +12,8 @@ IMA-SDK is a tool for dApp developers that emulates SKALE Node + IMA env on a si
 * docker-compose
 * nodejs (any version)
 
+### Initial setup
+
 1. Clone this repo
 2. Copy .env template and fill variables:
 
@@ -36,10 +38,12 @@ cp privkey.pem ~/skale-ima-sdk/ssl/ssl_key
 cp cert.pem ~/skale-ima-sdk/ssl/ssl_cert
 ```
 
+### Run SDK
+
 5. Execute to run SDK and deploy contracts:
 
 ```bash
-WAIT=True bash scripts/run_sdk.sh
+SDK_VERSION={put sdk version here} WAIT=True bash scripts/run_sdk.sh
 ```
 
 Now sChain and Mainnet parts are available:
