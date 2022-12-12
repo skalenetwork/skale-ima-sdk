@@ -45,6 +45,8 @@ cp cert.pem ~/skale-ima-sdk/ssl/ssl_cert
 ```bash
 SDK_VERSION={put sdk version here} WAIT=True bash scripts/run_sdk.sh
 ```
+your find sdk version here https://hub.docker.com/r/skalenetwork/ima_sdk/tags
+
 
 Now sChain and Mainnet parts are available:
 
