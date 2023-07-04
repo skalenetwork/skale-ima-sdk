@@ -38,9 +38,9 @@ services:
         networks:
             - ima
     ganache:
-        image: trufflesuite/ganache-cli:latest
+        image: trufflesuite/ganache:v7.8.0
         container_name: ima_sdk_ganache
-        entrypoint: sh /scripts/run_ganache.sh
+        command: --account="0x$SDK_PRIVATE_KEY,100000000000000000000000000" --account="0x$TEST_PRIVATE_KEY,100000000000000000000000000" -l 80000000 -b 0.01
         environment:
             SDK_PRIVATE_KEY: $SDK_PRIVATE_KEY
             TEST_PRIVATE_KEY: $TEST_PRIVATE_KEY
