@@ -65,7 +65,11 @@ echo "INSECURE_PRIVATE_KEY_FOR_SCHAIN=${PRIVATE_KEY_FOR_SCHAIN}"
 
 echo "URL_W3_ETHEREUM=${URL_W3_ETHEREUM}"
 echo "URL_W3_S_CHAIN=${URL_W3_S_CHAIN}"
-echo " "
+
+
+echo "CHAIN_ID_MAIN_NET=${CHAIN_ID_MAIN_NET}"
+echo "CHAIN_ID_S_CHAIN=${CHAIN_ID_S_CHAIN}"
+echo "---------------"
 
 
 echo " "
