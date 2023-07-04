@@ -55,7 +55,7 @@ http://$DOMAIN_NAME/schain # if you have SSL certs and domain name
 https://$DOMAIN_NAME/schain # if you have SSL certs and domain name
 
 # Mainnet
-http://$IP_ADDRESS:1545
+http://$IP_ADDRESS:8545
 http://$DOMAIN_NAME/mainnet # if you have SSL certs and domain name
 https://$DOMAIN_NAME/mainnet # if you have SSL certs and domain name
 ```
