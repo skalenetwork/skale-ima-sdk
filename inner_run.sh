@@ -149,6 +149,7 @@ echo " "
 echo "Will start IMA agent transfer loop..."
 cd /IMA/agent || exit
 node ./main.js --verbose=9 --expose --gas-price-multiplier=2 \
+    --skip-dry-run \
     --loop \
     --url-main-net=$URL_W3_ETHEREUM \
     --url-s-chain=$URL_W3_S_CHAIN \
